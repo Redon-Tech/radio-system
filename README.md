@@ -12,3 +12,14 @@
 # Overview
 
 A currently unnamed radio system for Roblox using the new voice/sound APIs.
+
+# Developer
+
+## ToDo
+
+| Status | Name           | Description                                               |
+| ------ | -------------- | --------------------------------------------------------- |
+| WIP    | UI Design/Code | The UI for the radio system.                              |
+| WIP    | Chat           | Chat                                                      |
+| WIP    | Voice          | Voice                                                     |
+| WIP    | API            | API to send audio/chat messages to the radio from scripts |
