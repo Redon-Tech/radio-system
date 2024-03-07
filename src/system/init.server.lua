@@ -28,6 +28,12 @@ local function initClient(Player: Player)
 	radioClient.Parent = PlayerGui
 end
 
+local comm = require(sharedFolder:WaitForChild("comm"))
+comm.setup()
+
+local main = require(script:WaitForChild("server"):WaitForChild("main"))
+main.init()
+
 -- Startup --
 Players.PlayerAdded:Connect(initClient)
 

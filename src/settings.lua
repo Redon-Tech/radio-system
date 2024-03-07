@@ -13,17 +13,46 @@ local settings = {}
 
 --\ CHANNELS /--
 
+--[[
+	This configures all avaliable channels, each team can get specific acces as configured below.
+	Format:
+	[id] = {
+		["name"] = "channelName",
+	}
+--]]
 settings.channels = {
 	[1] = {
-		["name"] = "default",
+		["name"] = "Main",
+	},
+	[2] = {
+		["name"] = "Tac1",
+	},
+	[3] = {
+		["name"] = "Tac2",
+	},
+	[4] = {
+		["name"] = "Police",
+	},
+	[5] = {
+		["name"] = "Fire",
 	},
 }
 
---\ ACCESS /--
 --[[
-All access is simply defined by either the channel numbers,
-or false for none,
-or true for all.
+	How many messages should be stored in the channel history?
+	Setting this to 0 will disable history.
+	This only affects when a player receives the radio gui,
+	it will not change how much history is stored as the channel
+	fills up. Basically player join they get x history of the channel.
+--]]
+settings.channelHistory = 100
+
+--\ ACCESS /--
+
+--[[
+	All access is simply defined by either the channel numbers,
+	or false for none,
+	or true for all.
 --]]
 
 settings.default = false
@@ -38,6 +67,32 @@ settings.users = {
 	[1234567890] = true,
 	["Player1"] = true,
 }
+
+--\ UI /--
+
+--[[
+	Where should the UI be positioned?
+	TopLeft, TopRight, BottomLeft, BottomRight
+--]]
+settings.uiPosition = "TopLeft"
+
+settings.overrideUiPosition = nil -- Set to a UDim2 to override the position
+
+--\ CHAT CONFIG /--
+
+--[[
+	When the player is on a team with radio access, should the chat window be force removed?
+	Basically this means only the input bar will be visible no matter what when the player is on a team with radio access.
+
+	Removes the chat window, this makes it easier to use the radio when in the TopLeft position.
+--]]
+settings.overrideWindowEnabled = true
+
+--[[
+	Enabled bubble chat. Text will appear above the player is what it means.
+	If you already have bubble chat enabled this can be ignored.
+--]]
+settings.forceBubbleChat = true
 
 --\ DEVELOPER /--
 settings.v = "0.1-alpha.1"
