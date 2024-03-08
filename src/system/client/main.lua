@@ -34,9 +34,12 @@ function main.init()
 	local voiceEvents = comm.new("voice")
 	local data = {
 		textEvents = {
+			comm = textEvents,
 			clientMessage = textEvents:remoteEvent("clientMessage"),
 			systemMessage = textEvents:remoteEvent("systemMessage"),
+			sendHistory = textEvents:remoteEvent("sendHistory"),
 		},
+		authorizedChannels = Value({}),
 		activeChannel = Value(1),
 		activeMessages = Value({}),
 		textActive = Value(false),
@@ -45,14 +48,47 @@ function main.init()
 	local self = setmetatable(data, main)
 
 	self:setupObservers()
+	self:setupEvents()
 	self.channels = self:setupChannels()
 	self.mainUi = self:createUi()
+	self:requestAuthorizedChannels()
 
+
+	print("Initialized Radio System")
+	return self
+end
+
+function main:requestAuthorizedChannels()
+	local authorizedChannels = {}
+	for _,channelId in pairs(self.textEvents.comm:remoteFunction("authorize")) do
+		authorizedChannels[channelId] = systemSettings.channels[channelId]
+	end
+	self.authorizedChannels:set(authorizedChannels)
+
+	if #authorizedChannels == 0 then
+		self.mainUi.Enabled = false
+	else
+		self.mainUi.Enabled = true
+		if authorizedChannels[self.activeChannel:get()] == nil then
+			for channelId,_ in pairs(authorizedChannels) do
+				self.activeChannel:set(channelId)
+				break
+			end
+		end
+	end
+end
+
+function main:setupEvents()
 	self.textEvents.clientMessage:connect(function(...)
 		self:receiveClientMessage(...)
 	end)
 
-	UserInputService.InputBegan:Connect(function(input)
+	self.textEvents.sendHistory:connect(function(channelId, history: {})
+		self:recieveChannelHistory(channelId, history)
+	end)
+
+	UserInputService.InputBegan:Connect(function(input, robloxProcessedEvent)
+		if robloxProcessedEvent == true then return end
 		if input.KeyCode == Enum.KeyCode.T then
 			self.textActive:set(not self.textActive:get())
 		end
@@ -64,8 +100,14 @@ function main.init()
 		end
 	end)
 
-	print("Initialized Radio System")
-	return self
+	localPlayer:GetPropertyChangedSignal("Team"):Connect(function()
+		self:requestAuthorizedChannels()
+	end)
+end
+
+function main:activeChannelChange()
+	local activeChannel = self.activeChannel:get()
+	self.activeMessages:set(table.clone(self.channels[activeChannel]:get()))
 end
 
 function main:setupObservers()
@@ -75,8 +117,7 @@ function main:setupObservers()
 	local voiceActiveObserver = Observer(self.voiceActive)
 
 	activeChannelObserver:onChange(function()
-		local activeChannel = self.activeChannel:get()
-		self.activeMessages:set(table.clone(self.channels[activeChannel]:get()))
+		self:activeChannelChange()
 	end)
 
 	activeMessagesObserver:onChange(function()
@@ -112,6 +153,28 @@ function main:setupChannels()
 
 	print("Channels set up")
 	return channels
+end
+
+function main:recieveChannelHistory(channelId: number, history: {})
+	local channel = self.channels[channelId]
+	if channel == nil then
+		warn("Received history for non-existant channel")
+		return
+	end
+	local newHistory = {}
+	for _,message in pairs(history) do
+		table.insert(newHistory, {
+			id = #newHistory + 1,
+			icon = game.Players:GetUserThumbnailAsync(message.player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48),
+			iconRounded = true,
+			headerText = message.player.Name,
+			text = message.message,
+		})
+	end
+	channel:set(newHistory)
+	if channelId == self.activeChannel:get() then
+		self:activeChannelChange()
+	end
 end
 
 function main:receiveClientMessage(channelId: number, player: Player, message: string)
@@ -177,7 +240,7 @@ function main:createUi()
 							Topbar = radioTopbar {},
 							Channels = radioChannels {
 								[Children] = {
-									ForPairs(systemSettings.channels, function(id, channel)
+									ForPairs(self.authorizedChannels, function(id, channel)
 										return id, radioChannel {
 											Id = id,
 											Text = channel.name,

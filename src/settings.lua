@@ -59,8 +59,11 @@ settings.default = false
 
 settings.teams = {
 	["Police"] = {
-		1,
+		1, 2, 3, 4,
 	},
+	["Fire"] = {
+		1, 2, 3, 5,
+	}
 }
 
 settings.users = {

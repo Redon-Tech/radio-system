@@ -120,14 +120,14 @@ function comm:remoteEvent(name: string, ...): {
 		function remoteEvent:fireFilter(filter: (Player, ...any) -> boolean, ...)
 			for _, player:Player in pairs(Players:GetPlayers()) do
 				if filter(player, ...) then
-					self:Fire(player, ...)
+					self:fire(player, ...)
 				end
 			end
 		end
 
 		function remoteEvent:fireFor(players: {Player}, ...)
 			for _,player:Player in pairs(players) do
-				self:Fire(player, ...)
+				self:fire(player, ...)
 			end
 		end
 

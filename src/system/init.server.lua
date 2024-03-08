@@ -35,7 +35,9 @@ local main = require(script:WaitForChild("server"):WaitForChild("main"))
 main.init()
 
 -- Startup --
-Players.PlayerAdded:Connect(initClient)
+local radioClient = script.client:Clone()
+radioClient.Name = "radioClient"
+radioClient.Parent = game.StarterGui
 
 for _,player:Player in ipairs(Players:GetPlayers()) do
 	initClient(player)

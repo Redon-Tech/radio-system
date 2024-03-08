@@ -24,6 +24,7 @@ function main.init()
 		textEvents = {
 			clientMessage = textEvents:remoteEvent("clientMessage"),
 			systemMessage = textEvents:remoteEvent("systemMessage"),
+			sendHistory = textEvents:remoteEvent("sendHistory"),
 		}
 	}
 	local self = setmetatable(data, main)
@@ -34,9 +35,21 @@ function main.init()
 	self.textEvents.clientMessage:connect(function(...)
 		self:receiveMessage(...)
 	end)
+	self.textEvents.authorize = textEvents:remoteFunction("authorize", self, "authorizeClient")
 
 	print("Initialized Radio System")
 	return self
+end
+
+function main:authorizeClient(player: Player)
+	local authorizedChannels = {}
+	for id,channel in pairs(self.channels) do
+		if channel:addPlayerWithChecks(player) then
+			table.insert(authorizedChannels, id)
+		end
+	end
+
+	return authorizedChannels
 end
 
 function main:receiveMessage(player: Player, message: string, channelId: number)

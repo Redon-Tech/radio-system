@@ -23,8 +23,16 @@ function channel.init(main:{any}, id: number)
 		id = id,
 		name = systemSettings.channels[id].name,
 		messages = {}, -- UNFILTERED
+		teams = {},
+		players = {},
 	}
 	local self = setmetatable(data, channel)
+
+	for team,access in pairs(systemSettings.teams) do
+		if (typeof(access) == "boolean" and access == true) or (typeof(access) == "table" and table.find(access, id)) then
+			self.teams[team] = true
+		end
+	end
 
 	print(`Initialized Channel {id}`)
 	return self
@@ -48,10 +56,60 @@ function channel:_addMessageToHistory(player: Player?, message: string)
 end
 
 function channel:receiveMessage(player: Player, message: string)
+	if self.players[player] == nil then
+		warn(`{player.Name} is not apart of {self.name}`)
+		return
+	end
 	self:_addMessageToHistory(player, message)
 
 	message = Chat:FilterStringAsync(message, player, player) -- Ideally we would filter with playerTo, but no
-	self.main.textEvents.clientMessage:fireAll(self.id, player, message)
+	self.main.textEvents.clientMessage:fireFilter(function(player: Player)
+		if self.players[player] then
+			return true
+		end
+		return false
+	end, self.id, player, message)
+end
+
+function channel:addPlayer(player: Player)
+	local playerHistory = {}
+	for _,message in pairs(self.messages) do
+		table.insert(playerHistory, {
+			player = message.player,
+			message = Chat:FilterStringAsync(message.message, message.player, message.player),
+		})
+	end
+	self.main.textEvents.sendHistory:fire(player, self.id, playerHistory)
+	
+	if self.players[player] then
+		print(`[adding,debug] {player.Name} is already apart of {self.name}`)
+		return
+	end
+
+	self.players[player] = true
+end
+
+function channel:removePlayer(player: Player)
+	if self.players[player] == nil then
+		print(`[removing,debug] {player.Name} is not apart of {self.name}`)
+		return
+	end
+
+	self.players[player] = nil
+end
+
+function channel:addPlayerWithChecks(player: Player): boolean
+	if (typeof(systemSettings.users[player.UserId]) == "boolean" and systemSettings.users[player.UserId] == true)
+	or (typeof(systemSettings.users[player.UserId]) == "table" and table.find(systemSettings.users[player.UserId], self.id))
+	or (typeof(systemSettings.users[player.Name]) == "boolean" and systemSettings.users[player.Name] == true)
+	or (typeof(systemSettings.users[player.Name]) == "table" and table.find(systemSettings.users[player.Name], self.id))
+	or (player.Team ~= nil and self.teams[player.Team.Name] == true)
+	then
+		self:addPlayer(player)
+		return true
+	end
+	self:removePlayer(player)
+	return false
 end
 
 return channel

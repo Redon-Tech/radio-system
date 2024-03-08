@@ -1,35 +1,55 @@
 {
-  "name": "radio-system",
-  "tree": {
-    "$className": "DataModel",
-    "ServerScriptService": {
-      "radio-system": {
-        "$path": "src"
-      }
-    },
-    "Workspace": {
-      "Baseplate": {
-        "$className": "Part",
-        "$properties": {
-          "Anchored": true,
-          "Color": [
-            0.38823,
-            0.37254,
-            0.38823
-          ],
-          "Locked": true,
-          "Position": [
-            0,
-            -10,
-            0
-          ],
-          "Size": [
-            512,
-            20,
-            512
-          ]
-        }
-      }
-    }
-  }
+	"name": "radio-system",
+	"tree": {
+		"$className": "DataModel",
+		"ServerScriptService": {
+			"radio-system": {
+				"$path": "src"
+			},
+			"server": {
+				"$path": "dev/server.server.lua"
+			}
+		},
+		"ReplicatedStorage": {
+			"RemoteEvent": {
+				"$className": "RemoteEvent"
+			}
+		},
+		"StarterPlayer": {
+			"StarterPlayerScripts": {
+				"client": {
+					"$path": "dev/client.client.lua"
+				}
+			}
+		},
+		"StarterGui": {
+			"ScreenGui": {
+				"$path": "dev/ScreenGui.rbxm"
+			}
+		},
+		"Workspace": {
+			"Baseplate": {
+				"$className": "Part",
+				"$properties": {
+					"Anchored": true,
+					"Color": [
+						0.38823,
+						0.37254,
+						0.38823
+					],
+					"Locked": true,
+					"Position": [
+						0,
+						-10,
+						0
+					],
+					"Size": [
+						512,
+						20,
+						512
+					]
+				}
+			}
+		}
+	}
 }
