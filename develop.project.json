@@ -27,6 +27,35 @@
 				"$path": "dev/ScreenGui.rbxm"
 			}
 		},
+		"Teams": {
+			"Civilian": {
+				"$className": "Team",
+				"$properties": {
+					"AutoAssignable": true,
+					"TeamColor": {
+						"BrickColor": 313
+					}
+				}
+			},
+			"Fire": {
+				"$className": "Team",
+				"$properties": {
+					"AutoAssignable": false,
+					"TeamColor": {
+						"BrickColor": 21
+					}
+				}
+			},
+			"Police": {
+				"$className": "Team",
+				"$properties": {
+					"AutoAssignable": false,
+					"TeamColor": {
+						"BrickColor": 23
+					}
+				}
+			}
+		},
 		"Workspace": {
 			"Baseplate": {
 				"$className": "Part",
