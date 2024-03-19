@@ -13,6 +13,7 @@ local Fusion = require(shared:WaitForChild("Fusion"))
 local systemSettings = require(shared:WaitForChild("settings"))
 local comm = require(shared:WaitForChild("comm"))
 local components = script.Parent:WaitForChild("components")
+local audio = require(script.Parent:WaitForChild("audio"))
 
 local New, Children, Value, ForPairs, Observer = Fusion.New, Fusion.Children, Fusion.Value, Fusion.ForPairs, Fusion.Observer
 local radioTopbar = require(components:WaitForChild("radioTopbar"))
@@ -60,8 +61,16 @@ function main.init()
 	self.mainUi = self:createUi()
 	self:requestAuthorizedChannels()
 
-
-	print("Initialized Radio System")
+	self.messageRecieved = audio.new(self, systemSettings.audio.messageRecieved, false)
+	self.sideTone = audio.new(self, systemSettings.audio.sideTone, true)
+	self.keyDown = audio.new(self, systemSettings.audio.keyDown, false)
+	self.keyUp = audio.new(self, systemSettings.audio.keyUp, false)
+	if localPlayer.Character then
+		self.messageRecieved:setParent(localPlayer.Character.HumanoidRootPart)
+		self.sideTone:setParent(localPlayer.Character.HumanoidRootPart)
+		self.keyDown:setParent(localPlayer.Character.HumanoidRootPart)
+		self.keyUp:setParent(localPlayer.Character.HumanoidRootPart)
+	end
 	return self
 end
 
@@ -105,12 +114,16 @@ function main:setupEvents()
 	end)
 
 	localPlayer.CharacterAdded:Connect(function(character)
-		if self.enabled == true then
+		if self.enabled:get() == true then
 			character:WaitForChild("RSEmitter")
 			local wire = shared:WaitForChild("wires"):WaitForChild(self.activeChannel:get())
 			wire.TargetInstance = localPlayer.Character.RSEmitter
 			self.activeWire:set(wire)
 		end
+		self.messageRecieved:setParent(localPlayer.Character.HumanoidRootPart)
+		self.sideTone:setParent(localPlayer.Character.HumanoidRootPart)
+		self.keyDown:setParent(localPlayer.Character.HumanoidRootPart)
+		self.keyUp:setParent(localPlayer.Character.HumanoidRootPart)
 	end)
 end
 
@@ -144,15 +157,19 @@ function main:setupObservers()
 		self.mainUi.Container.Radio.Topbar.Mic.Image = voiceActive and "rbxassetid://16516224290" or "rbxassetid://16516226674"
 		self.mainUi.Container.Radio.Topbar.Mic.ImageColor3 = voiceActive and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 0, 0)
 
-		if voiceActive == true then
+		if voiceActive == true and self.enabled:get() == true then
 			if self.activeVoice:get() == nil then
 				self.voiceEvents.activateVoice:fire(self.activeChannel:get())
+				self.keyDown:play()
 			else
-				-- TODO: Add sound thing
+				self.sideTone:play()
 			end
 		else
 			if self.activeVoice:get() == localPlayer then
 				self.voiceEvents.activateVoice:fire(self.activeChannel:get())
+				self.keyUp:play()
+			else
+				self.sideTone:stop()
 			end
 		end
 	end)
@@ -230,7 +247,6 @@ function main:activeChannelChange()
 		local wire = shared:WaitForChild("wires"):WaitForChild(activeChannel)
 		wire.TargetInstance = localPlayer.Character.RSEmitter
 		self.activeWire:set(wire)
-		print(wire.Connected)
 	end
 end
 
@@ -289,6 +305,7 @@ function main:receiveClientMessage(channelId: number, player: Player, message: s
 		local activeMessages = self.activeMessages:get()
 		table.insert(activeMessages, messageData)
 		self.activeMessages:set(activeMessages)
+		self.messageRecieved:play()
 	end
 end
 

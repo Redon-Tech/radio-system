@@ -81,6 +81,22 @@ settings.uiPosition = "TopLeft"
 
 settings.overrideUiPosition = nil -- Set to a UDim2 to override the position
 
+--[[
+	Until Roblox makes public audios possible you have to
+	manually remake this audios...
+	Default audio is from http://www.w2sjw.com/radio_sounds.html
+	sideTone is MDC_Sidetone
+	keyDown/keyUp/messageRecieved is MDC1200
+
+	You can set to nil or false to disable any sounds
+--]]
+settings.audio = {
+	messageRecieved = "rbxassetid://16800392019",
+	sideTone = "rbxassetid://16800390322",
+	keyDown = "rbxassetid://16800392019",
+	keyUp = "rbxassetid://16800392019",
+}
+
 --\ CHAT CONFIG /--
 
 --[[

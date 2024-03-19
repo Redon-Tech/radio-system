@@ -24,6 +24,7 @@ function channel.init(main:{any}, id: number)
 		name = systemSettings.channels[id].name,
 		messages = {}, -- UNFILTERED
 		teams = {},
+		isDefaultChannel = (typeof(systemSettings.default) == "boolean" and systemSettings.default == true) or (typeof(systemSettings.default) == "table" and table.find(systemSettings.default, id)),
 		players = {},
 		activeVoice = nil,
 	}
@@ -133,6 +134,7 @@ function channel:addPlayerWithChecks(player: Player): boolean
 	or (typeof(systemSettings.users[player.Name]) == "boolean" and systemSettings.users[player.Name] == true)
 	or (typeof(systemSettings.users[player.Name]) == "table" and table.find(systemSettings.users[player.Name], self.id))
 	or (player.Team ~= nil and self.teams[player.Team.Name] == true)
+	or (self.isDefaultChannel)
 	then
 		self:addPlayer(player)
 		return true
