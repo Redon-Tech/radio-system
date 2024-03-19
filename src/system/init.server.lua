@@ -10,6 +10,10 @@
 --]]
 
 local Players = game:GetService("Players")
+local settings = script.Parent.settings
+local systemSettings = require(settings)
+
+print(`\n		[RTRS]: Initializing System\n		Version: {systemSettings.v}\n		Debug Mode: {systemSettings.debug}`)
 
 
 local sharedFolder = script.shared
@@ -20,7 +24,6 @@ local wireFolder = Instance.new("Folder")
 wireFolder.Name = "wires"
 wireFolder.Parent = sharedFolder
 
-local settings = script.Parent.settings
 settings.Parent = sharedFolder
 
 local function initClient(Player: Player)
@@ -46,3 +49,5 @@ radioClient.Parent = game.StarterGui
 for _,player:Player in ipairs(Players:GetPlayers()) do
 	initClient(player)
 end
+
+print("\n		[RTRS]: Initialized")

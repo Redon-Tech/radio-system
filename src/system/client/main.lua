@@ -30,7 +30,7 @@ local warn = function(...)
 end
 
 function main.init()
-	print("Initializing Radio System")
+	print("Initializing Client")
 	local textEvents = comm.new("text")
 	local voiceEvents = comm.new("voice")
 	local data = {
@@ -71,6 +71,8 @@ function main.init()
 		self.keyDown:setParent(localPlayer.Character.HumanoidRootPart)
 		self.keyUp:setParent(localPlayer.Character.HumanoidRootPart)
 	end
+
+	print("Initialized Client")
 	return self
 end
 

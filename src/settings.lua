@@ -114,7 +114,7 @@ settings.overrideWindowEnabled = true
 settings.forceBubbleChat = true
 
 --\ DEVELOPER /--
-settings.v = "0.1-alpha.1"
+settings.v = "1.0-rc.2"
 settings.debug = true
 
 return settings

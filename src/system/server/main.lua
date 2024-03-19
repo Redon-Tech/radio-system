@@ -18,7 +18,7 @@ local warn = function(...)
 end
 
 function main.init()
-	print("Initializing Radio System")
+	print("Initializing Server")
 	local textEvents = comm.new("text")
 	local voiceEvents = comm.new("voice")
 	local data = {
@@ -46,7 +46,7 @@ function main.init()
 		self:activateVoice(...)
 	end)
 
-	print("Initialized Radio System")
+	print("Initialized Server")
 	return self
 end
 
