@@ -25,6 +25,7 @@ function channel.init(main:{any}, id: number)
 		messages = {}, -- UNFILTERED
 		teams = {},
 		players = {},
+		activeVoice = nil,
 	}
 	local self = setmetatable(data, channel)
 
@@ -34,9 +35,15 @@ function channel.init(main:{any}, id: number)
 		end
 	end
 
+	self.wire = Instance.new("Wire")
+	self.wire.Name = self.id
+	self.wire.Parent = shared:WaitForChild("wires")
+
 	print(`Initialized Channel {id}`)
 	return self
 end
+
+-- Text Features
 
 function channel:_addMessageToHistory(player: Player?, message: string)
 	if systemSettings.channelHistory == 0 then return end
@@ -71,6 +78,24 @@ function channel:receiveMessage(player: Player, message: string)
 	end, self.id, player, message)
 end
 
+-- Voice Features
+
+function channel:activateVoice(player: Player)
+	if self.activeVoice ~= nil and self.activeVoice ~= player then warn(`{player} tried to activate voice while channel is already in use, ignoring.`) return end
+	if self.players[player] == nil then
+		warn(`{player.Name} is not apart of {self.name}`)
+		return
+	end
+
+	self.activeVoice = if self.activeVoice == player then nil else player
+	self.main.voiceEvents.activateVoice:fireAll(self.id, self.activeVoice)
+	self.wire.SourceInstance = if self.activeVoice ~= nil and self.activeVoice.Character ~= nil then
+		self.activeVoice.Character.HumanoidRootPart:FindFirstChild("RSListener") else nil
+	print(self.activeVoice, self.wire.SourceInstance)
+end
+
+-- Player Add/Remove
+
 function channel:addPlayer(player: Player)
 	local playerHistory = {}
 	for _,message in pairs(self.messages) do
@@ -96,6 +121,10 @@ function channel:removePlayer(player: Player)
 	end
 
 	self.players[player] = nil
+	if self.activeVoice == player then
+		self.activeVoice = nil
+		self.main.voiceEvents.activateVoice:fireAll(self.id, self.activeVoice)
+	end
 end
 
 function channel:addPlayerWithChecks(player: Player): boolean

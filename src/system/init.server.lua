@@ -16,6 +16,10 @@ local sharedFolder = script.shared
 sharedFolder.Name = "radioShared"
 sharedFolder.Parent = game.ReplicatedStorage
 
+local wireFolder = Instance.new("Folder")
+wireFolder.Name = "wires"
+wireFolder.Parent = sharedFolder
+
 local settings = script.Parent.settings
 settings.Parent = sharedFolder
 

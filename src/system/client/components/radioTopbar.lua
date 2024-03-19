@@ -59,7 +59,8 @@ return function()
 				BackgroundTransparency = 1,
 				AnchorPoint = Vector2.new(1, 0.5),
 				Position = UDim2.fromScale(0.975, 0.5),
-				Image = "http://www.roblox.com/asset/?id=16516224290",
+				Image = "rbxassetid://16516226674",
+				ImageColor3 = Color3.fromRGB(255, 0, 0),
 				ScaleType = Enum.ScaleType.Fit
 			}
 		}

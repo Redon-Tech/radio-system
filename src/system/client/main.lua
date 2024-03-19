@@ -39,9 +39,16 @@ function main.init()
 			systemMessage = textEvents:remoteEvent("systemMessage"),
 			sendHistory = textEvents:remoteEvent("sendHistory"),
 		},
+		voiceEvents = {
+			comm = voiceEvents,
+			activateVoice = voiceEvents:remoteEvent("activateVoice")
+		},
+		enabled = Value(false),
 		authorizedChannels = Value({}),
 		activeChannel = Value(1),
 		activeMessages = Value({}),
+		activeVoice = Value(nil),
+		activeWire = Value(nil),
 		textActive = Value(false),
 		voiceActive = Value(false),
 	}
@@ -58,26 +65,6 @@ function main.init()
 	return self
 end
 
-function main:requestAuthorizedChannels()
-	local authorizedChannels = {}
-	for _,channelId in pairs(self.textEvents.comm:remoteFunction("authorize")) do
-		authorizedChannels[channelId] = systemSettings.channels[channelId]
-	end
-	self.authorizedChannels:set(authorizedChannels)
-
-	if #authorizedChannels == 0 then
-		self.mainUi.Enabled = false
-	else
-		self.mainUi.Enabled = true
-		if authorizedChannels[self.activeChannel:get()] == nil then
-			for channelId,_ in pairs(authorizedChannels) do
-				self.activeChannel:set(channelId)
-				break
-			end
-		end
-	end
-end
-
 function main:setupEvents()
 	self.textEvents.clientMessage:connect(function(...)
 		self:receiveClientMessage(...)
@@ -87,10 +74,23 @@ function main:setupEvents()
 		self:recieveChannelHistory(channelId, history)
 	end)
 
+	self.voiceEvents.activateVoice:connect(function(channelId, player)
+		self:activateVoice(channelId, player)
+	end)
+
 	UserInputService.InputBegan:Connect(function(input, robloxProcessedEvent)
 		if robloxProcessedEvent == true then return end
 		if input.KeyCode == Enum.KeyCode.T then
 			self.textActive:set(not self.textActive:get())
+		elseif input.KeyCode == Enum.KeyCode.Y then
+			self.voiceActive:set(true)
+		end
+	end)
+
+	UserInputService.InputEnded:Connect(function(input, robloxProcessedEvent)
+		if robloxProcessedEvent == true then return end
+		if input.KeyCode == Enum.KeyCode.Y then
+			self.voiceActive:set(false)
 		end
 	end)
 
@@ -103,11 +103,15 @@ function main:setupEvents()
 	localPlayer:GetPropertyChangedSignal("Team"):Connect(function()
 		self:requestAuthorizedChannels()
 	end)
-end
 
-function main:activeChannelChange()
-	local activeChannel = self.activeChannel:get()
-	self.activeMessages:set(table.clone(self.channels[activeChannel]:get()))
+	localPlayer.CharacterAdded:Connect(function(character)
+		if self.enabled == true then
+			character:WaitForChild("RSEmitter")
+			local wire = shared:WaitForChild("wires"):WaitForChild(self.activeChannel:get())
+			wire.TargetInstance = localPlayer.Character.RSEmitter
+			self.activeWire:set(wire)
+		end
+	end)
 end
 
 function main:setupObservers()
@@ -115,6 +119,8 @@ function main:setupObservers()
 	local activeMessagesObserver = Observer(self.activeMessages)
 	local textActiveObserver = Observer(self.textActive)
 	local voiceActiveObserver = Observer(self.voiceActive)
+	local activeVoiceObserver = Observer(self.activeVoice)
+	local enabledObserver = Observer(self.enabled)
 
 	activeChannelObserver:onChange(function()
 		self:activeChannelChange()
@@ -131,6 +137,43 @@ function main:setupObservers()
 		local textActive = self.textActive:get()
 		self.mainUi.Container.Radio.Topbar.Chat.Image = textActive and "rbxassetid://16516225857" or "rbxassetid://16516253569"
 		self.mainUi.Container.Radio.Topbar.Chat.ImageColor3 = textActive and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 0, 0)
+	end)
+
+	voiceActiveObserver:onChange(function()
+		local voiceActive = self.voiceActive:get()
+		self.mainUi.Container.Radio.Topbar.Mic.Image = voiceActive and "rbxassetid://16516224290" or "rbxassetid://16516226674"
+		self.mainUi.Container.Radio.Topbar.Mic.ImageColor3 = voiceActive and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 0, 0)
+
+		if voiceActive == true then
+			if self.activeVoice:get() == nil then
+				self.voiceEvents.activateVoice:fire(self.activeChannel:get())
+			else
+				-- TODO: Add sound thing
+			end
+		else
+			if self.activeVoice:get() == localPlayer then
+				self.voiceEvents.activateVoice:fire(self.activeChannel:get())
+			end
+		end
+	end)
+
+	activeVoiceObserver:onChange(function()
+		local activeVoice = self.activeVoice:get()
+		if activeVoice == localPlayer then
+			self.activeWire:get().TargetInstance = nil
+		elseif localPlayer.Character ~= nil then
+			self.activeWire:get().TargetInstance = localPlayer.Character:FindFirstChild("RSEmitter")
+		end
+	end)
+
+	enabledObserver:onChange(function()
+		local enabled = self.enabled:get()
+		if enabled == false then
+			if self.activeWire:get() ~= nil then
+				self.activeWire:get().TargetInstance = nil
+				self.activeWire:set(nil)
+			end
+		end
 	end)
 end
 
@@ -154,6 +197,53 @@ function main:setupChannels()
 	print("Channels set up")
 	return channels
 end
+
+-- Combo Features
+
+function main:requestAuthorizedChannels()
+	local authorizedChannels = {}
+	for _,channelId in pairs(self.textEvents.comm:remoteFunction("authorize")) do
+		authorizedChannels[channelId] = systemSettings.channels[channelId]
+	end
+	self.authorizedChannels:set(authorizedChannels)
+
+	if #authorizedChannels == 0 then
+		self.enabled:set(false)
+		self.mainUi.Enabled = false
+	else
+		self.enabled:set(true)
+		self.mainUi.Enabled = true
+		if authorizedChannels[self.activeChannel:get()] == nil then
+			for channelId,_ in pairs(authorizedChannels) do
+				self.activeChannel:set(channelId)
+				break
+			end
+		end
+	end
+end
+
+function main:activeChannelChange()
+	local activeChannel = self.activeChannel:get()
+	self.activeMessages:set(table.clone(self.channels[activeChannel]:get()))
+	if self.activeWire:get() then self.activeWire:get().TargetInstance = nil end
+	if localPlayer.Character ~= nil then
+		local wire = shared:WaitForChild("wires"):WaitForChild(activeChannel)
+		wire.TargetInstance = localPlayer.Character.RSEmitter
+		self.activeWire:set(wire)
+		print(wire.Connected)
+	end
+end
+
+-- Voice Features
+
+function main:activateVoice(channelId: number, player: Player)
+	if self.activeChannel:get() == channelId then
+		self.activeVoice:set(player)
+		print(self.activeWire:get().Connected)
+	end
+end
+
+-- Text Features
 
 function main:recieveChannelHistory(channelId: number, history: {})
 	local channel = self.channels[channelId]
@@ -201,6 +291,8 @@ function main:receiveClientMessage(channelId: number, player: Player, message: s
 		self.activeMessages:set(activeMessages)
 	end
 end
+
+-- UI
 
 function main:createUi()
 	return New "ScreenGui" {
