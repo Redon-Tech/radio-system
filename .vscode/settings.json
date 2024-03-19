@@ -1,4 +1,4 @@
 {
-	"editor.detectIndentation": false,
+	"editor.detectIndentation": true,
 	"editor.insertSpaces": false
 }

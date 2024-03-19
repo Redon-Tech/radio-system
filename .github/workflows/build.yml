@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install Foreman
+        uses: Roblox/setup-foreman@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+  
+      - name: Create builds directory
+        run: mkdir -p builds
+
+      - name: Run Build Command
+        run: rojo build build.project.json -o builds/redon-tech-radio-system.rbxmx
+
+      - name: Upload Files
+        run: gh release upload ${{ github.ref_name }} roblox/builds/*.rbxl
+        env:
+          GITHUB_TOKEN: ${{ github.TOKEN }}
