@@ -27,6 +27,6 @@ jobs:
         run: rojo build build.project.json -o builds/redon-tech-radio-system.rbxmx
 
       - name: Upload Files
-        run: gh release upload ${{ github.ref_name }} roblox/builds/*.rbxl
+        run: gh release upload ${{ github.ref_name }} builds/*.rbxmx
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
