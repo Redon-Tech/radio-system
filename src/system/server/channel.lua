@@ -1,5 +1,17 @@
 -- Redon Tech Radio System
 
+type SystemMessage = {
+	text: string,
+	headerText: string?,
+	backgroundColor3: Color3?,
+	icon: string?,
+	iconColor3: Color3?,
+	iconRounded: boolean?,
+	sideText: string?,
+	sideAccent: Color3?,
+}
+
+
 local channel = {}
 channel.__index = channel
 
@@ -79,6 +91,10 @@ function channel:receiveMessage(player: Player, message: string)
 	end, self.id, player, message)
 end
 
+function channel:sendSystemMessage(message: SystemMessage)
+	self.main.textEvents.systemMessage:fireAll(self.id, message)
+end
+
 -- Voice Features
 
 function channel:activateVoice(player: Player)
@@ -100,19 +116,27 @@ end
 function channel:addPlayer(player: Player)
 	local playerHistory = {}
 	for _,message in pairs(self.messages) do
+		local success, filteredMessage = pcall(function()
+			return Chat:FilterStringAsync(message.message, message.player, message.player)
+		end)
+		if success == false then
+			warn("Could not filter\n", filteredMessage)
+			filteredMessage = Chat:FilterStringForBroadcast(message.message, player)
+		end
 		table.insert(playerHistory, {
 			player = message.player,
-			message = Chat:FilterStringAsync(message.message, message.player, message.player),
+			message = filteredMessage,
 		})
 	end
 	self.main.textEvents.sendHistory:fire(player, self.id, playerHistory)
-	
+
 	if self.players[player] then
 		print(`[adding,debug] {player.Name} is already apart of {self.name}`)
 		return
 	end
 
 	self.players[player] = true
+	self.main.serverApi:fire("channelAddPlayer", self.id, player)
 end
 
 function channel:removePlayer(player: Player)
@@ -126,6 +150,7 @@ function channel:removePlayer(player: Player)
 		self.activeVoice = nil
 		self.main.voiceEvents.activateVoice:fireAll(self.id, self.activeVoice)
 	end
+	self.main.serverApi:fire("channelRemovePlayer", self.id, player)
 end
 
 function channel:addPlayerWithChecks(player: Player): boolean

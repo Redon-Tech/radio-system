@@ -8,11 +8,17 @@
 			},
 			"server": {
 				"$path": "dev/server.server.lua"
+			},
+			"Radio System Server API": {
+				"$path": "apis/server.lua"
 			}
 		},
 		"ReplicatedStorage": {
 			"RemoteEvent": {
 				"$className": "RemoteEvent"
+			},
+			"Radio System Client API": {
+				"$path": "apis/client.lua"
 			}
 		},
 		"StarterPlayer": {

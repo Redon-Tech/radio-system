@@ -40,6 +40,7 @@ function main.init()
 
 	local textEvents = comm.new("text")
 	local voiceEvents = comm.new("voice")
+	local apiEvents = comm.new("api")
 	local data = {
 		textEvents = {
 			comm = textEvents,
@@ -51,6 +52,8 @@ function main.init()
 			comm = voiceEvents,
 			activateVoice = voiceEvents:remoteEvent("activateVoice")
 		},
+		apiEvents = apiEvents,
+		clientApi = apiEvents:bindableEvent("clientApi"),
 		enabled = Value(false),
 		authorizedChannels = Value({}),
 		activeChannel = Value(1),
@@ -86,14 +89,35 @@ end
 function main:setupEvents()
 	self.textEvents.clientMessage:connect(function(...)
 		self:receiveClientMessage(...)
+		self.clientApi:fire("clientMessageRecieved", ...)
+	end)
+
+	self.textEvents.systemMessage:connect(function(...)
+		self:receiveMessage(...)
+		self.clientApi:fire("systemMessageRecieved", ...)
 	end)
 
 	self.textEvents.sendHistory:connect(function(channelId, history: {})
 		self:recieveChannelHistory(channelId, history)
+		self.clientApi:fire("messageHistoryRecieved", channelId, history)
 	end)
 
 	self.voiceEvents.activateVoice:connect(function(channelId, player)
 		self:activateVoice(channelId, player)
+		self.clientApi:fire("voiceRecieve", channelId, player)
+	end)
+
+	self.clientApiFunction = self.apiEvents:bindableFunction("clientApiFunction", function(message: string)
+		if message == "getEnabled" then
+			return self.enabled:get()
+		end
+	end)
+
+	self.clientApi:connect(function(message: string, ...)
+		if message == "setEnabled" and typeof(...) == "boolean" then
+			self.enabled:set(...)
+			self.mainUi.Enabled = ...
+		end
 	end)
 
 	UserInputService.InputBegan:Connect(function(input, robloxProcessedEvent)
@@ -250,24 +274,32 @@ end
 -- Combo Features
 
 function main:requestAuthorizedChannels()
-	local authorizedChannels = {}
-	for _,channelId in pairs(self.textEvents.comm:remoteFunction("authorize")) do
-		authorizedChannels[channelId] = systemSettings.channels[channelId]
-	end
-	self.authorizedChannels:set(authorizedChannels)
+	local success, error = pcall(function()
+		local authorizedChannels = {}
+		for _,channelId in pairs(self.textEvents.comm:remoteFunction("authorize")) do
+			authorizedChannels[channelId] = systemSettings.channels[channelId]
+		end
+		self.authorizedChannels:set(authorizedChannels)
 
-	if #authorizedChannels == 0 then
-		self.enabled:set(false)
-		self.mainUi.Enabled = false
-	else
-		self.enabled:set(true)
-		self.mainUi.Enabled = true
-		if authorizedChannels[self.activeChannel:get()] == nil then
-			for channelId,_ in pairs(authorizedChannels) do
-				self.activeChannel:set(channelId)
-				break
+		if #authorizedChannels == 0 then
+			self.enabled:set(false)
+			self.mainUi.Enabled = false
+		else
+			self.enabled:set(true)
+			self.mainUi.Enabled = true
+			if authorizedChannels[self.activeChannel:get()] == nil then
+				for channelId,_ in pairs(authorizedChannels) do
+					self.activeChannel:set(channelId)
+					break
+				end
 			end
 		end
+	end)
+
+	if success == false then
+		warn(`Failed to retrieve authorized channels\n{error}`)
+		self.enabled:set(false)
+		self.mainUi.Enabled = false
 	end
 end
 
@@ -331,6 +363,40 @@ function main:receiveClientMessage(channelId: number, player: Player, message: s
 		text = message,
 		sideAccent = player.TeamColor.Color
 	}
+	table.insert(channelMessages, messageData)
+	channel:set(channelMessages)
+
+	if self.activeChannel:get() == channelId then
+		local activeMessages = self.activeMessages:get()
+		table.insert(activeMessages, messageData)
+		self.activeMessages:set(activeMessages)
+		self.messageRecieved:play()
+	end
+end
+
+function main:receiveMessage(channelId: number, message: {
+	text: string,
+	headerText: string?,
+	backgroundColor3: Color3?,
+	icon: string?,
+	iconColor3: Color3?,
+	iconRounded: boolean?,
+	sideText: string?,
+	sideAccent: Color3?,
+})
+	local channel = self.channels[channelId]
+	if channel == nil then
+		warn("Received message for non-existant channel")
+		return
+	end
+
+	local channelMessages = channel:get()
+	local messageData = {
+		id = #channelMessages + 1
+	}
+	for i,v in pairs(message) do
+		messageData[i] = v
+	end
 	table.insert(channelMessages, messageData)
 	channel:set(channelMessages)
 

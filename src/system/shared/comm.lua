@@ -150,4 +150,48 @@ function comm:remoteEvent(name: string, ...): {
 	end
 end
 
+function comm:bindableFunction(name: string, bindTo:{}|(...any)->...any, funcName:string): BindableFunction
+	if self:folderCheck() == false then return end
+
+	if self.folder:FindFirstChild(name) then warn(`BindableFunction {name} already exists.`) return end
+
+	local bindableFunction = Instance.new("BindableFunction")
+	bindableFunction.Name = name
+	bindableFunction.Parent = self.folder
+
+	if typeof(bindTo) == "table" then
+		bindableFunction.OnInvoke = function(...)
+			return bindTo[funcName](bindTo, ...) -- the first param is bindTo to pass back in self :D
+		end
+	else
+		bindableFunction.OnInvoke = bindTo
+	end
+	return bindableFunction
+end
+
+function comm:bindableEvent(name: string, ...): {
+	event: BindableEvent,
+	connect: (any, func:(...any) -> ...any) -> RBXScriptConnection,
+	fire: (...any) -> nil,
+}
+	if self:folderCheck() == false then return end
+
+	local bindableEvent = {}
+	bindableEvent.__index = bindableEvent
+
+	bindableEvent.remote = self.folder:FindFirstChild(name) or Instance.new("BindableEvent")
+	bindableEvent.remote.Name = name
+	bindableEvent.remote.Parent = self.folder
+
+	function bindableEvent:connect(func: (...any) -> ...any): RBXScriptConnection
+		return self.remote.Event:Connect(func)
+	end
+
+	function bindableEvent:fire(...)
+		self.remote:Fire(...)
+	end
+
+	return bindableEvent
+end
+
 return comm

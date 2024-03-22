@@ -23,8 +23,14 @@ jobs:
       - name: Create builds directory
         run: mkdir -p builds
 
-      - name: Run Build Command
-        run: rojo build build.project.json -o builds/redon-tech-radio-system.rbxmx
+      - name: Build Radio System
+        run: rojo build build.project.json -o builds/redon-tech-RADIO-SYSTEM.rbxmx
+
+      - name: Build Client API
+        run: rojo build clientapi.project.json -o builds/client-api.rbxmx
+
+      - name: Build Server API
+        run: rojo build serverapi.project.json -o builds/server-api.rbxmx
 
       - name: Upload Files
         run: gh release upload ${{ github.ref_name }} builds/*.rbxmx

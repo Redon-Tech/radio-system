@@ -21,6 +21,7 @@ function main.init()
 	print("Initializing Server")
 	local textEvents = comm.new("text")
 	local voiceEvents = comm.new("voice")
+	local apiEvents = comm.new("api")
 	local data = {
 		textEvents = {
 			clientMessage = textEvents:remoteEvent("clientMessage"),
@@ -29,7 +30,9 @@ function main.init()
 		},
 		voiceEvents = {
 			activateVoice = voiceEvents:remoteEvent("activateVoice")
-		}
+		},
+		apiEvents = apiEvents,
+		serverApi = apiEvents:bindableEvent("serverApi")
 	}
 	local self = setmetatable(data, main)
 
@@ -39,11 +42,17 @@ function main.init()
 
 	self.textEvents.clientMessage:connect(function(...)
 		self:receiveMessage(...)
+		self.serverApi:fire("receivedClientMessage", ...)
 	end)
 	self.textEvents.authorize = textEvents:remoteFunction("authorize", self, "authorizeClient")
 
 	self.voiceEvents.activateVoice:connect(function(...)
 		self:activateVoice(...)
+		self.serverApi:fire("receivedActivateVoice", ...)
+	end)
+	
+	self.serverApi:connect(function(...)
+		self:serverApiEvent(...)
 	end)
 
 	print("Initialized Server")
@@ -57,6 +66,7 @@ function main:authorizeClient(player: Player)
 			table.insert(authorizedChannels, id)
 		end
 	end
+	self.serverApi:fire("authorizedClient", player, authorizedChannels)
 
 	return authorizedChannels
 end
@@ -147,6 +157,28 @@ function main:setupAudio()
 	for _,player in pairs(Players:GetPlayers()) do playerAdded(player) end
 
 	print("Voice setup")
+end
+
+function main:serverApiEvent(message: string, ...)
+	if message == "createSystemMessage" then
+		local channelId: number, data: {} = ...
+		local channel = self.channels[channelId]
+		if channel == nil then
+			warn("Received message for non-existant channel")
+			return
+		end
+
+		channel:sendSystemMessage(data)
+	elseif message == "activatePlayersVoice" then
+		local channelId: number, player: Player = ...
+		local channel = self.channels[channelId]
+		if channel == nil then
+			warn("Received message for non-existant channel")
+			return
+		end
+
+		channel:activateVoice(player)
+	end
 end
 
 return main
