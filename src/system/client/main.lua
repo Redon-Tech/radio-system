@@ -105,11 +105,21 @@ function main:setupEvents()
 		end
 	end)
 
-	localPlayer.Chatted:Connect(function(message)
-		if self.textActive:get() then
-			self.textEvents.clientMessage:fire(message, self.activeChannel:get())
-		end
-	end)
+	if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
+		localPlayer.Chatted:Connect(function(message)
+			if self.textActive:get() then
+				self.textEvents.clientMessage:fire(message, self.activeChannel:get())
+				self.clientApi:fire("sendMessage", self.activeChannel:get(), message)
+			end
+		end)
+	elseif TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+		TextChatService.SendingMessage:Connect(function(textChatMessage)
+			if self.textActive:get() then
+				self.textEvents.clientMessage:fire(textChatMessage.Text, self.activeChannel:get())
+				self.clientApi:fire("sendMessage", self.activeChannel:get(), textChatMessage.Text)
+			end
+		end)
+	end
 
 	localPlayer:GetPropertyChangedSignal("Team"):Connect(function()
 		self:requestAuthorizedChannels()
