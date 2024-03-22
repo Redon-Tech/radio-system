@@ -323,6 +323,20 @@ function main:receiveClientMessage(channelId: number, player: Player, message: s
 end
 
 -- UI
+local anchorPoint = Vector2.new(0, 0)
+local position = UDim2.fromScale(0, 0)
+if systemSettings.uiPosition:lower() == "topright" then
+	anchorPoint = Vector2.new(1, 0)
+	position = UDim2.fromScale(1, 0)
+elseif systemSettings.uiPosition:lower() == "bottomleft" then
+	anchorPoint = Vector2.new(0, 1)
+	position = UDim2.fromScale(0, 1)
+elseif systemSettings.uiPosition:lower() == "bottomright" then
+	anchorPoint = Vector2.new(1, 1)
+	position = UDim2.fromScale(1, 1)
+elseif typeof(systemSettings.overrideUiPosition) == "UDim2" then
+	position = systemSettings.overrideUiPosition
+end
 
 function main:createUi()
 	return New "ScreenGui" {
@@ -351,8 +365,8 @@ function main:createUi()
 						Size = UDim2.fromScale(0.35, 0.3),
 						BackgroundColor3 = Color3.fromRGB(40, 40, 40),
 						BorderSizePixel = 0,
-						AnchorPoint = Vector2.new(0, 0),
-						Position = UDim2.fromScale(0, 0),
+						AnchorPoint = anchorPoint,
+						Position = position,
 
 						[Children] = {
 							UICorner = New "UICorner" {
