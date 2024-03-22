@@ -299,6 +299,7 @@ function main:receiveClientMessage(channelId: number, player: Player, message: s
 		iconRounded = true,
 		headerText = player.Name,
 		text = message,
+		sideAccent = player.TeamColor.Color
 	}
 	table.insert(channelMessages, messageData)
 	channel:set(channelMessages)

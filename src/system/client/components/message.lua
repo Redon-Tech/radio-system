@@ -53,8 +53,24 @@ return function(props)
 			else nil,
 			SideAccent = if props.sideAccent ~= nil then
 				New "Frame" {
-					Size = UDim2.new(0, 2, 1, 0),
+					Size = UDim2.fromScale(1, 1),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
 					BackgroundColor3 = props.sideAccent,
+
+					[Children] = {
+						UICorner = New "UICorner" {
+							CornerRadius = UDim.new(0, 10),
+						},
+						UIGradient = New "UIGradient" {
+							Transparency = NumberSequence.new({
+								NumberSequenceKeypoint.new(0, 0),
+								NumberSequenceKeypoint.new(0.0075, 0),
+								NumberSequenceKeypoint.new(0.0076, 1),
+								NumberSequenceKeypoint.new(1, 1)
+							})
+						}
+					}
 				}
 			else nil,
 			HeaderText = if props.headerText ~= nil then
