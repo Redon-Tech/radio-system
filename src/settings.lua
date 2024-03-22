@@ -67,8 +67,8 @@ settings.teams = {
 }
 
 settings.users = {
-	[1234567890] = true,
-	["Player1"] = true,
+	[123456789000] = true,
+	["over_twenty_characters"] = true,
 }
 
 --\ UI /--
@@ -101,20 +101,14 @@ settings.audio = {
 
 --[[
 	When the player is on a team with radio access, should the chat window be force removed?
-	Basically this means only the input bar will be visible no matter what when the player is on a team with radio access.
 
 	Removes the chat window, this makes it easier to use the radio when in the TopLeft position.
+	**ONLY WORKS WITH NEW TEXT CHAT SERVICE**
 --]]
 settings.overrideWindowEnabled = true
 
---[[
-	Enabled bubble chat. Text will appear above the player is what it means.
-	If you already have bubble chat enabled this can be ignored.
---]]
-settings.forceBubbleChat = true
-
 --\ DEVELOPER /--
-settings.v = "1.0-rc.2"
+settings.v = "1.0-rc.3"
 settings.debug = true
 
 return settings
