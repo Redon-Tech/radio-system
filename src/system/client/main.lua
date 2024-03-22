@@ -6,6 +6,7 @@ main.__index = main
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local TextChatService = game:GetService("TextChatService")
 
 local localPlayer = Players.LocalPlayer
 local shared = ReplicatedStorage:WaitForChild("radioShared")
@@ -31,6 +32,12 @@ end
 
 function main.init()
 	print("Initializing Client")
+	-- We run this before everything else to prevent errors :D
+	if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+		local windowConfig = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
+		windowConfig:SetAttribute("defaultState", windowConfig.Enabled)
+	end
+
 	local textEvents = comm.new("text")
 	local voiceEvents = comm.new("voice")
 	local data = {
@@ -197,7 +204,20 @@ function main:setupObservers()
 
 	enabledObserver:onChange(function()
 		local enabled = self.enabled:get()
-		if enabled == false then
+		if enabled == true then
+			if systemSettings.overrideWindowEnabled == true then
+				if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+					TextChatService:FindFirstChildOfClass("ChatWindowConfiguration").Enabled = false
+				end
+			end
+		elseif enabled == false then
+			if systemSettings.overrideWindowEnabled == true then
+				if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+					local windowConfig = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
+					windowConfig.Enabled = windowConfig:GetAttribute("defaultState")
+				end
+			end
+
 			if self.activeWire:get() ~= nil then
 				self.activeWire:get().TargetInstance = nil
 				self.activeWire:set(nil)
