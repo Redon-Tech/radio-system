@@ -1,4 +1,4 @@
-<h1 align="center">Radio System (Unnamed)</h1>
+<h1 align="center">Radio System</h1>
 
 <div align="center">
   
@@ -11,15 +11,32 @@
 
 # Overview
 
-A currently unnamed radio system for Roblox using the new voice/sound APIs.
+A radio system made by Redon Tech that is highly custamizable and easy to setup, featuring both text and voice communications allowing for less travel between services in order to communicate effectively.
+
+# Features
+
+- Channels
+- Voice Communications
+- Highly Customizable
+- API
+
+# Planned Features
+
+- Audio API
+
+# Installation
+Read the [Setup Guide](https://radio.redon.tech/setup/) for more information.
+
+# Documentation
+[Visit the official documentation](https://radio.redon.tech/)
 
 # Developer
 
 ## ToDo
 
-| Status | Name           | Description                                               |
-| ------ | -------------- | --------------------------------------------------------- |
-| WIP    | UI Design/Code | The UI for the radio system.                              |
-| WIP    | Chat           | Chat                                                      |
-| WIP    | Voice          | Voice                                                     |
-| WIP    | API            | API to send audio/chat messages to the radio from scripts |
+| Status   | Name           | Description                                         |
+| -------- | -------------- | --------------------------------------------------- |
+| Complete | UI Design/Code | The UI for the radio system.                        |
+| Complete | Chat           | Chat                                                |
+| Complete | Voice          | Voice                                               |
+| Complete | API            | API to send chat messages to the radio from scripts |

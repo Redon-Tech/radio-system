@@ -1,0 +1,74 @@
+site_name: Radio System Docs
+site_description: 'Documentation for https://github.com/Redon-Tech/Radio-System/'
+site_author: 'Redon Tech'
+docs_dir: docs/
+repo_name: 'Redon-Tech/Radio-System'
+repo_url: 'https://github.com/Redon-Tech/Radio-System/'
+nav:
+    - Home: index.md
+    - Setup:
+      - Setup Home: setup/index.md
+      - Setup: setup/setup.md
+      - Configuration: setup/configuration.md
+    - Guide:
+      - API:
+        - Overview: guide/api/index.md
+        - Client Wrapper: guide/api/client.md
+        - Server Wrapper: guide/api/server.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Redon-Tech
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/Eb384Xw
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/parker02311
+
+theme:
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.tracking
+    - navigation.top
+    - toc.follow
+    - content.code.copy
+    - content.tabs.link
+  name: 'material'
+  icon:
+    logo: fontawesome/solid/walkie-talkie
+  favicon: https://redon.tech/assets/img/Redon%20Tech%20Logo%20New%20Transparent.png
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: red
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: red
+      toggle:
+        icon: material/brightness-3
+        name: Switch to light mode
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - pymdownx.details
+  - pymdownx.tilde
+  - admonition
+  - tables
+  - def_list
+  - attr_list
+  - md_in_html
+  - footnotes
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
