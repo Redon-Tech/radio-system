@@ -14,7 +14,7 @@ The API is just a simple bindable event for both the server and client, but to m
 # Support
 Our maintainers will provide basic support for API usage, we will not teach you how to code.
 
-[Client API Wrapper](/guide/api/client){ .md-button .md-button--primary }
-[Server API Wrapper](/guide/api/server){ .md-button .md-button--primary }
+[Client API Wrapper](client.md){ .md-button .md-button--primary }
+[Server API Wrapper](server.md){ .md-button .md-button--primary }
 
 [^1]: You can download the rbxmx files from [GitHub](https://github.com/Redon-Tech/Radio-System/releases/latest)

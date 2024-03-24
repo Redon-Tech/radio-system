@@ -7,4 +7,4 @@ Installing is really easy, simply drag and drop the provided folder into `Server
 
 Make sure to have `VoiceChatService.UseAudioApi` set to `Enabled`!!!
 
-[Next: Configuration](/setup/configuration){ .md-button .md-button--primary }
+[Next: Configuration](configuration.md){ .md-button .md-button--primary }

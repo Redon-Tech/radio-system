@@ -22,6 +22,6 @@ The Radio System is designed to be easy to install and use, however if you have 
 - Teams setup and ready to be used
 - Basic knowledge on how to setup systems
 
-[Next: Installing the System](/setup/setup){ .md-button .md-button--primary }
+[Next: Installing the System](setup.md){ .md-button .md-button--primary }
 
 [^1]: You can download the rbxmx files from [GitHub](https://github.com/Redon-Tech/Radio-System/releases/latest)

@@ -3,7 +3,7 @@ authors:
     - parker02311
 ---
 
-This guide is the next part after [setting up the system](/setup/setup). If you have not done this step please do it before continuing.
+This guide is the next part after [setting up the system](setup.md). If you have not done this step please do it before continuing.
 
 ## Finding the Configuration module
 It is under the provided folder in the ModuleScript called `settings`
@@ -115,6 +115,17 @@ Note: The UI has a 30 pixel sized padding always.
 Default Value:
 ```lua
 settings.overrideUiPosition = nil
+```
+
+#### `settings.keybinds`
+Allows you to change the default keybinds for the radio system. 
+
+Default Value:
+```lua
+settings.keybinds = {
+	text = Enum.KeyCode.T,
+	mic = Enum.KeyCode.Y
+}
 ```
 
 #### `settings.audio`
