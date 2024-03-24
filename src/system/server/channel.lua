@@ -68,6 +68,7 @@ function channel:_addMessageToHistory(player: Player?, message: string)
 	table.insert(self.messages, {
 		player = player,
 		message = message,
+		color = player.TeamColor.Color,
 	})
 
 	if #self.messages >= systemSettings.channelHistory then
@@ -126,6 +127,7 @@ function channel:addPlayer(player: Player)
 		table.insert(playerHistory, {
 			player = message.player,
 			message = filteredMessage,
+			color = message.color
 		})
 	end
 	self.main.textEvents.sendHistory:fire(player, self.id, playerHistory)

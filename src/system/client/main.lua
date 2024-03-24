@@ -339,6 +339,7 @@ function main:recieveChannelHistory(channelId: number, history: {})
 			iconRounded = true,
 			headerText = message.player.Name,
 			text = message.message,
+			sideAccent = message.color
 		})
 	end
 	channel:set(newHistory)
