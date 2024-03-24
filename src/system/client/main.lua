@@ -122,16 +122,16 @@ function main:setupEvents()
 
 	UserInputService.InputBegan:Connect(function(input, robloxProcessedEvent)
 		if robloxProcessedEvent == true then return end
-		if input.KeyCode == Enum.KeyCode.T then
+		if input.KeyCode == systemSettings.keybinds.text then
 			self.textActive:set(not self.textActive:get())
-		elseif input.KeyCode == Enum.KeyCode.Y then
+		elseif input.KeyCode == systemSettings.keybinds.mic then
 			self.voiceActive:set(true)
 		end
 	end)
 
 	UserInputService.InputEnded:Connect(function(input, robloxProcessedEvent)
 		if robloxProcessedEvent == true then return end
-		if input.KeyCode == Enum.KeyCode.Y then
+		if input.KeyCode == systemSettings.keybinds.mic then
 			self.voiceActive:set(false)
 		end
 	end)

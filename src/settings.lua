@@ -82,6 +82,14 @@ settings.uiPosition = "TopLeft"
 settings.overrideUiPosition = nil -- Set to a UDim2 to override the position
 
 --[[
+	The keybinds used to enable/disable mic/text
+]]
+settings.keybinds = {
+	text = Enum.KeyCode.T,
+	mic = Enum.KeyCode.Y
+}
+
+--[[
 	Until Roblox makes public audios possible you have to
 	manually remake this audios...
 	Default audio is from http://www.w2sjw.com/radio_sounds.html
