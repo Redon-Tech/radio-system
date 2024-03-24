@@ -425,7 +425,7 @@ elseif typeof(systemSettings.overrideUiPosition) == "UDim2" then
 end
 
 function main:createUi()
-	return New "ScreenGui" {
+	local ui = New "ScreenGui" {
 		Name = "radioClient",
 		Parent = script.Parent,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
@@ -495,6 +495,20 @@ function main:createUi()
 			}
 		}
 	}
+
+	ui.Frame.Container.Radio.Topbar.Chat.MouseButton1Click:Connect(function()
+		self.textActive:set(not self.textActive:get())
+	end)
+
+	ui.Frame.Container.Radio.Topbar.Mic.MouseButton1Down:Connect(function()
+		self.voiceActive:set(true)
+	end)
+
+	ui.Frame.Container.Radio.Topbar.Mic.MouseButton1Up:Connect(function()
+		self.voiceActive:set(false)
+	end)
+
+	return ui
 end
 
 return main
