@@ -70,8 +70,8 @@ function channel:_addMessageToHistory(player: Player?, message: string)
 		message = message,
 	})
 
-	if #self.messages >= 100 then
-		table.remove(self.messages, #self.messages - 100)
+	if #self.messages >= systemSettings.channelHistory then
+		table.remove(self.messages, #self.messages - systemSettings.channelHistory)
 	end
 end
 
