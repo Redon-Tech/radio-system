@@ -497,15 +497,15 @@ function main:createUi()
 		}
 	}
 
-	ui.Frame.Container.Radio.Topbar.Chat.MouseButton1Click:Connect(function()
+	ui.Container.Radio.Topbar.Chat.MouseButton1Click:Connect(function()
 		self.textActive:set(not self.textActive:get())
 	end)
 
-	ui.Frame.Container.Radio.Topbar.Mic.MouseButton1Down:Connect(function()
+	ui.Container.Radio.Topbar.Mic.MouseButton1Down:Connect(function()
 		self.voiceActive:set(true)
 	end)
 
-	ui.Frame.Container.Radio.Topbar.Mic.MouseButton1Up:Connect(function()
+	ui.Container.Radio.Topbar.Mic.MouseButton1Up:Connect(function()
 		self.voiceActive:set(false)
 	end)
 
