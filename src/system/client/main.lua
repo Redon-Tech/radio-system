@@ -427,7 +427,7 @@ end
 function main:createUi()
 	local ui = New "ScreenGui" {
 		Name = "radioClient",
-		Parent = script.Parent,
+		Parent = localPlayer:WaitForChild("PlayerGui"),
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 
 		[Children] = {
