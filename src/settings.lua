@@ -125,7 +125,7 @@ settings.audio = {
 settings.overrideWindowEnabled = true
 
 --\ DEVELOPER /--
-settings.v = "1.0.0"
+settings.v = "1.1.0"
 settings.debug = false
 
 return settings
