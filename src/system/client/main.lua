@@ -211,9 +211,8 @@ function main:setupObservers()
 			if self.activeVoice:get() == localPlayer then
 				self.voiceEvents.activateVoice:fire(self.activeChannel:get())
 				self.keyUp:play()
-			else
-				self.sideTone:stop()
 			end
+			self.sideTone:stop()
 		end
 	end)
 
