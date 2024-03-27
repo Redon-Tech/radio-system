@@ -16,7 +16,7 @@ local comm = require(shared:WaitForChild("comm"))
 local components = script.Parent:WaitForChild("components")
 local audio = require(script.Parent:WaitForChild("audio"))
 
-local New, Children, Value, ForPairs, Observer = Fusion.New, Fusion.Children, Fusion.Value, Fusion.ForPairs, Fusion.Observer
+local New, Children, Value, ForPairs, Observer, OnEvent = Fusion.New, Fusion.Children, Fusion.Value, Fusion.ForPairs, Fusion.Observer, Fusion.OnEvent
 local radioTopbar = require(components:WaitForChild("radioTopbar"))
 local radioChannels = require(components:WaitForChild("radioChannels"))
 local radioChannel = require(components:WaitForChild("radioChannel"))
@@ -55,6 +55,7 @@ function main.init()
 		apiEvents = apiEvents,
 		clientApi = apiEvents:bindableEvent("clientApi"),
 		enabled = Value(false),
+		visible = Value(nil),
 		authorizedChannels = Value({}),
 		activeChannel = Value(1),
 		activeMessages = Value({}),
@@ -116,7 +117,6 @@ function main:setupEvents()
 	self.clientApi:connect(function(message: string, ...)
 		if message == "setEnabled" and typeof(...) == "boolean" then
 			self.enabled:set(...)
-			self.mainUi.Enabled = ...
 		end
 	end)
 
@@ -126,6 +126,8 @@ function main:setupEvents()
 			self.textActive:set(not self.textActive:get())
 		elseif input.KeyCode == systemSettings.keybinds.mic then
 			self.voiceActive:set(true)
+		elseif input.KeyCode == systemSettings.keybinds.hide then
+			self.visible:set(not self.visible:get())
 		end
 	end)
 
@@ -177,6 +179,7 @@ function main:setupObservers()
 	local voiceActiveObserver = Observer(self.voiceActive)
 	local activeVoiceObserver = Observer(self.activeVoice)
 	local enabledObserver = Observer(self.enabled)
+	local visibleObserver = Observer(self.visible)
 
 	activeChannelObserver:onChange(function()
 		self:activeChannelChange()
@@ -225,8 +228,21 @@ function main:setupObservers()
 		end
 	end)
 
+	local function setVisible(forceTo: boolean?)
+		local visible = if forceTo ~= nil then forceTo else self.visible:get()
+		local enabled = self.enabled:get()
+
+		self.mainUi.Container.Radio.Visible = if enabled == true then visible else false
+		self.mainUi.Container.ShowRadio.Visible = if enabled == true then not visible else false
+		self.mainUi.DisplayOrder = if visible == true then 0 else 999
+	end
+	visibleObserver:onChange(setVisible)
+
 	enabledObserver:onChange(function()
 		local enabled = self.enabled:get()
+		setVisible(enabled)
+		self.visible:set(enabled)
+		
 		if enabled == true then
 			if systemSettings.overrideWindowEnabled == true then
 				if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
@@ -282,10 +298,8 @@ function main:requestAuthorizedChannels()
 
 		if #authorizedChannels == 0 then
 			self.enabled:set(false)
-			self.mainUi.Enabled = false
 		else
 			self.enabled:set(true)
-			self.mainUi.Enabled = true
 			if authorizedChannels[self.activeChannel:get()] == nil then
 				for channelId,_ in pairs(authorizedChannels) do
 					self.activeChannel:set(channelId)
@@ -298,7 +312,6 @@ function main:requestAuthorizedChannels()
 	if success == false then
 		warn(`Failed to retrieve authorized channels\n{error}`)
 		self.enabled:set(false)
-		self.mainUi.Enabled = false
 	end
 end
 
@@ -440,26 +453,69 @@ function main:createUi()
 
 				[Children] = {
 					UIPadding = New "UIPadding" {
-						PaddingTop = UDim.new(0, 30),
-						PaddingBottom = UDim.new(0, 30),
-						PaddingLeft = UDim.new(0, 30),
-						PaddingRight = UDim.new(0, 30),
+						PaddingTop = UDim.new(0, 44),
+						PaddingBottom = UDim.new(0, 4),
+						PaddingLeft = UDim.new(0, 8),
+						PaddingRight = UDim.new(0, 8),
 					},
 
-					Radio = New "Frame" {
-						Name = "Radio",
-						Size = UDim2.fromScale(0.35, 0.3),
+					ShowRadio = New "TextButton" {
+						Name = "ShowRadio",
+						Size = UDim2.fromScale(0.084, 0.037),
 						BackgroundColor3 = Color3.fromRGB(40, 40, 40),
-						BorderSizePixel = 0,
-						AnchorPoint = anchorPoint,
-						Position = position,
+						AnchorPoint = Vector2.new(0,1),
+						Position = UDim2.fromScale(0, 1),
+						Visible = false,
+
+						Text = "Show Radio",
+						FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
+						TextScaled = true,
+						TextColor3 = Color3.fromRGB(255, 255, 255),
+						TextXAlignment = Enum.TextXAlignment.Center,
+
+						[OnEvent "Activated"] = function()
+							self.visible:set(true)
+						end,
 
 						[Children] = {
 							UICorner = New "UICorner" {
 								CornerRadius = UDim.new(0, 10),
 							},
 
-							Topbar = radioTopbar {},
+							UISizeConstraint = New "UISizeConstraint" {
+								MaxSize = Vector2.new(200, 50)
+							},
+
+							UIPadding = New "UIPadding" {
+								PaddingTop = UDim.new(0, 3),
+								PaddingBottom = UDim.new(0, 3),
+								PaddingLeft = UDim.new(0, 3),
+								PaddingRight = UDim.new(0, 3),
+							}
+						}
+					},
+
+					Radio = New "Frame" {
+						Name = "Radio",
+						Size = systemSettings.uiSize,
+						BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+						BorderSizePixel = 0,
+						AnchorPoint = anchorPoint,
+						Position = position,
+						Visible = false,
+
+						[Children] = {
+							UICorner = New "UICorner" {
+								CornerRadius = UDim.new(0, 10),
+							},
+
+							UISizeConstraint = New "UISizeConstraint" {
+								MaxSize = systemSettings.uiMaxSize
+							},
+
+							Topbar = radioTopbar {
+								visible = self.visible,
+							},
 							Channels = radioChannels {
 								[Children] = {
 									ForPairs(self.authorizedChannels, function(id, channel)

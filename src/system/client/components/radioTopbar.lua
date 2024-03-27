@@ -2,9 +2,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local shared = ReplicatedStorage:WaitForChild("radioShared")
 local Fusion = require(shared:WaitForChild("Fusion"))
 
-local New, Children = Fusion.New, Fusion.Children
+local New, Children, OnEvent = Fusion.New, Fusion.Children, Fusion.OnEvent
 
-return function()
+return function(props)
 	return New "Frame" {
 		Name = "Topbar",
 		Size = UDim2.fromScale(1, 0.173),
@@ -28,7 +28,7 @@ return function()
 				ZIndex = 0,
 			},
 
-			New "TextLabel" {
+			New "TextButton" {
 				Name = "Title",
 				Size = UDim2.fromScale(0.2, 1),
 				BackgroundTransparency = 1,
@@ -40,6 +40,10 @@ return function()
 				TextScaled = true,
 				TextColor3 = Color3.fromRGB(255, 255, 255),
 				TextXAlignment = Enum.TextXAlignment.Left,
+
+				[OnEvent "Activated"] = function()
+					props.visible:set(false)
+				end
 			},
 
 			New "ImageButton" {

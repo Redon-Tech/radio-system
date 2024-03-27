@@ -110,11 +110,29 @@ settings.uiPosition = "TopLeft"
 #### `settings.overrideUiPosition`
 Manually set the UI position, this will override the above setting. Setting to nil allows the above setting to control the position. 
 
-Note: The UI has a 30 pixel sized padding always. 
+Note: The UI has a built in padding size of Top 44px, Bottom 4px, Left/Right 8px. 
 
 Default Value:
 ```lua
 settings.overrideUiPosition = nil
+```
+
+#### `settings.uiSize`
+Allows you to adjust the UI size to fit your game. 
+
+Note: The UI has a size constraint which can be modified using the settings below. 
+
+Default Value:
+```lua
+settings.uiSize = UDim2.fromScale(0.4, 0.25)
+```
+
+#### `settings.uiMaxSize`
+Controls the maxsize of the UI, really only effective when using Scale. Default based off of Roblox. 
+
+Default Value:
+```lua
+settings.uiMaxSize = Vector2.new(475, 275)
 ```
 
 #### `settings.keybinds`
@@ -124,7 +142,8 @@ Default Value:
 ```lua
 settings.keybinds = {
 	text = Enum.KeyCode.T,
-	mic = Enum.KeyCode.Y
+	mic = Enum.KeyCode.Y,
+	hide = Enum.KeyCode.H
 }
 ```
 

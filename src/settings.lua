@@ -82,11 +82,20 @@ settings.uiPosition = "TopLeft"
 settings.overrideUiPosition = nil -- Set to a UDim2 to override the position
 
 --[[
+	Change the size of the UI
+	Must be a UDim2
+]]
+settings.uiSize = UDim2.fromScale(0.4, 0.3)
+
+settings.uiMaxSize = Vector2.new(475, 275) -- Same as new TextChatService default
+
+--[[
 	The keybinds used to enable/disable mic/text
 ]]
 settings.keybinds = {
 	text = Enum.KeyCode.T,
-	mic = Enum.KeyCode.Y
+	mic = Enum.KeyCode.Y,
+	hide = Enum.KeyCode.H -- You can also click the "Radio" text
 }
 
 --[[
