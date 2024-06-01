@@ -26,6 +26,9 @@ extra:
       link: https://www.youtube.com/parker02311
 
 theme:
+  font:
+    text: Fira Sans
+    code: Fira Code
   features:
     - navigation.instant
     - navigation.tabs
