@@ -1,0 +1,20 @@
+{
+	"ClassName": "Folder",
+	"Children": [
+		{
+			"ClassName": "AudioEqualizer",
+			"Properties": {
+				"HighGain": 10,
+				"LowGain": -40
+			}
+		},
+		{
+			"ClassName": "AudioDistortion",
+			"Children": [
+				{
+					"ClassName": "Wire"
+				}
+			]
+		}
+	]
+}

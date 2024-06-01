@@ -24,6 +24,12 @@ local wireFolder = Instance.new("Folder")
 wireFolder.Name = "wires"
 wireFolder.Parent = sharedFolder
 
+local effectFolder = sharedFolder:WaitForChild("effects")
+local audioDistortion = effectFolder:WaitForChild("AudioDistortion")
+local audioEqualizer = effectFolder:WaitForChild("AudioEqualizer")
+audioDistortion.Wire.SourceInstance = audioEqualizer
+audioDistortion.Wire.TargetInstance = audioDistortion
+
 settings.Parent = sharedFolder
 
 local function initClient(Player: Player)
@@ -44,10 +50,10 @@ main.init()
 -- Startup --
 local radioClient = script.client:Clone()
 radioClient.Name = "radioClient"
-radioClient.Parent = game.StarterGui
+radioClient.Parent = game.StarterPlayer.StarterPlayerScripts
 
-for _,player:Player in ipairs(Players:GetPlayers()) do
-	initClient(player)
-end
+-- for _,player:Player in ipairs(Players:GetPlayers()) do
+-- 	initClient(player)
+-- end
 
 print("\n		[RTRS]: Initialized")

@@ -10,6 +10,9 @@ local TextChatService = game:GetService("TextChatService")
 
 local localPlayer = Players.LocalPlayer
 local shared = ReplicatedStorage:WaitForChild("radioShared")
+local effects = shared:WaitForChild("effects")
+local audioDistortion = effects:WaitForChild("AudioDistortion")
+local audioEqualizer = effects:WaitForChild("AudioEqualizer")
 local Fusion = require(shared:WaitForChild("Fusion"))
 local systemSettings = require(shared:WaitForChild("settings"))
 local comm = require(shared:WaitForChild("comm"))
@@ -159,16 +162,20 @@ function main:setupEvents()
 	end)
 
 	localPlayer.CharacterAdded:Connect(function(character)
+		print("Character Added")
+		character:WaitForChild("HumanoidRootPart")
 		if self.enabled:get() == true then
-			character:WaitForChild("RSEmitter")
+			print("Radio Enabled")
+			local emitterWire = character:WaitForChild("RSEmitter"):WaitForChild("Wire")
+			emitterWire.SourceInstance = audioDistortion
 			local wire = shared:WaitForChild("wires"):WaitForChild(self.activeChannel:get())
-			wire.TargetInstance = localPlayer.Character.RSEmitter
+			wire.TargetInstance = audioEqualizer
 			self.activeWire:set(wire)
 		end
-		self.messageRecieved:setParent(localPlayer.Character.HumanoidRootPart)
-		self.sideTone:setParent(localPlayer.Character.HumanoidRootPart)
-		self.keyDown:setParent(localPlayer.Character.HumanoidRootPart)
-		self.keyUp:setParent(localPlayer.Character.HumanoidRootPart)
+		self.messageRecieved:setParent(character.HumanoidRootPart)
+		self.sideTone:setParent(character.HumanoidRootPart)
+		self.keyDown:setParent(character.HumanoidRootPart)
+		self.keyUp:setParent(character.HumanoidRootPart)
 	end)
 end
 
@@ -224,7 +231,7 @@ function main:setupObservers()
 		if activeVoice == localPlayer then
 			self.activeWire:get().TargetInstance = nil
 		elseif localPlayer.Character ~= nil then
-			self.activeWire:get().TargetInstance = localPlayer.Character:FindFirstChild("RSEmitter")
+			self.activeWire:get().TargetInstance = audioEqualizer
 		end
 	end)
 
@@ -321,7 +328,7 @@ function main:activeChannelChange()
 	if self.activeWire:get() then self.activeWire:get().TargetInstance = nil end
 	if localPlayer.Character ~= nil then
 		local wire = shared:WaitForChild("wires"):WaitForChild(activeChannel)
-		wire.TargetInstance = localPlayer.Character.RSEmitter
+		wire.TargetInstance = audioEqualizer
 		self.activeWire:set(wire)
 	end
 end

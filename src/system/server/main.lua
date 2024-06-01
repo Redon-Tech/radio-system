@@ -124,6 +124,9 @@ function main:characterAdded(input: AudioDeviceInput, character: Model)
 	local radioEmitter = Instance.new("AudioEmitter")
 	radioEmitter.Name = "RSEmitter"
 	radioEmitter.Parent = character
+	local wire = Instance.new("Wire")
+	wire.TargetInstance = radioEmitter
+	wire.Parent = radioEmitter
 	local radioListener = Instance.new("AudioListener")
 	radioListener.Name = "RSListener"
 	radioListener.AudioInteractionGroup = "RadioSystem"
