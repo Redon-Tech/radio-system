@@ -7,6 +7,9 @@
 	|_|  \_\  \___|  \__,_|  \___/  |_| |_|      |_|     \___|  \___| |_| |_|
 	Radio System
 	Server API
+
+	MIT License
+	Copyright (c) 2024 Redon Tech
 --]]
 
 -- Types
@@ -35,13 +38,13 @@ function server.init()
 			authorizedClient = {},
 			channelAddPlayer = {},
 			channelRemovePlayer = {},
-		}
+		},
 	}
 	local self = setmetatable(data, server)
 
 	self._mainConnection = self.serverApi:connect(function(message: string, ...)
 		if self.connections[message] then
-			for _,connection in pairs(self.connections[message]) do
+			for _, connection in pairs(self.connections[message]) do
 				connection(...)
 			end
 		end
@@ -64,7 +67,9 @@ function server:_connect(message: string, func: (...any) -> nil): ScriptConnecti
 	return connection
 end
 
-function server:receivedClientMessage(func: (player: Player, message: string, channelId: number) -> nil): ScriptConnection
+function server:receivedClientMessage(
+	func: (player: Player, message: string, channelId: number) -> nil
+): ScriptConnection
 	return self:_connect("receivedClientMessage", func)
 end
 
@@ -72,7 +77,7 @@ function server:receivedActivateVoice(func: (player: Player, channelId: number) 
 	return self:_connect("receivedActivateVoice", func)
 end
 
-function server:authorizedClient(func: (player: Player, authorizedChannels: {number}) -> nil): ScriptConnection
+function server:authorizedClient(func: (player: Player, authorizedChannels: { number }) -> nil): ScriptConnection
 	return self:_connect("authorizedClient", func)
 end
 
@@ -84,16 +89,19 @@ function server:channelRemovePlayer(func: (id: number, player: Player) -> nil): 
 	return self:_connect("channelRemovePlayer", func)
 end
 
-function server:createSystemMessage(channelId: number, message: {
-	text: string,
-	headerText: string?,
-	backgroundColor3: Color3?,
-	icon: string?,
-	iconColor3: Color3?,
-	iconRounded: boolean?,
-	sideText: string?,
-	sideAccent: Color3?,
-})
+function server:createSystemMessage(
+	channelId: number,
+	message: {
+		text: string,
+		headerText: string?,
+		backgroundColor3: Color3?,
+		icon: string?,
+		iconColor3: Color3?,
+		iconRounded: boolean?,
+		sideText: string?,
+		sideAccent: Color3?,
+	}
+)
 	self.serverApi:fire("createSystemMessage", channelId, message)
 end
 

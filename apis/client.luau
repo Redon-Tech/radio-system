@@ -7,6 +7,9 @@
 	|_|  \_\  \___|  \__,_|  \___/  |_| |_|      |_|     \___|  \___| |_| |_|
 	Radio System
 	Client API
+
+	MIT License
+	Copyright (c) 2024 Redon Tech
 --]]
 
 -- Types
@@ -35,13 +38,13 @@ function client.init()
 			messageHistoryRecieved = {},
 			voiceRecieve = {},
 			sendMessage = {},
-		}
+		},
 	}
 	local self = setmetatable(data, client)
 
 	self._mainConnection = self.clientApi:connect(function(message: string, ...)
 		if self.connections[message] then
-			for _,connection in pairs(self.connections[message]) do
+			for _, connection in pairs(self.connections[message]) do
 				connection(...)
 			end
 		end
@@ -64,20 +67,25 @@ function client:_connect(message: string, func: (...any) -> nil): ScriptConnecti
 	return connection
 end
 
-function client:clientMessageRecieved(func: (channelId: number, player: Player, message: string) -> nil): ScriptConnection
+function client:clientMessageRecieved(
+	func: (channelId: number, player: Player, message: string) -> nil
+): ScriptConnection
 	return self:_connect("clientMessageRecieved", func)
 end
 
-function client:systemMessageRecieved(func: (channelId: number, message: {
-	text: string,
-	headerText: string?,
-	backgroundColor3: Color3?,
-	icon: string?,
-	iconColor3: Color3?,
-	iconRounded: boolean?,
-	sideText: string?,
-	sideAccent: Color3?,
-}) -> nil): ScriptConnection
+function client:systemMessageRecieved(func: (
+	channelId: number,
+	message: {
+		text: string,
+		headerText: string?,
+		backgroundColor3: Color3?,
+		icon: string?,
+		iconColor3: Color3?,
+		iconRounded: boolean?,
+		sideText: string?,
+		sideAccent: Color3?,
+	}
+) -> nil): ScriptConnection
 	return self:_connect("systemMessageRecieved", func)
 end
 
