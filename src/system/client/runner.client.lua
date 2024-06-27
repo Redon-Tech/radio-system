@@ -7,5 +7,5 @@ local success, result = pcall(function()
 end)
 
 if not success then
-	warn("[RTRS Client]: Client could not start\n", result, "\n", debug.traceback())
+	warn("[RTRS Client]: Client could not start\n", result, "\nTraceback:\n", debug.traceback())
 end
