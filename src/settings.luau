@@ -122,9 +122,9 @@ settings.overrideUiPosition = nil -- Set to a UDim2 to override the position
 	Change the size of the UI
 	Must be a UDim2
 ]]
-settings.uiSize = UDim2.fromScale(0.4, 0.3)
+settings.uiSize = UDim2.fromScale(0.4, 0.35)
 
-settings.uiMaxSize = Vector2.new(475, 275) -- Same as new TextChatService default
+settings.uiMaxSize = Vector2.new(475, math.huge) -- Same as new TextChatService default
 
 --[[
 	The keybinds used to enable/disable mic/text
@@ -163,6 +163,14 @@ settings.audio = {
 	**ONLY WORKS WITH NEW TEXT CHAT SERVICE**
 --]]
 settings.overrideWindowEnabled = true
+
+--[[
+	Adds padding to the UI to account for the chat window
+	Recommended to set to 5 if not using TopLeft position
+
+	Default is 50
+]]
+settings.additionalTopPadding = 50
 
 --\ DEVELOPER /--
 settings.v = "1.2.0"

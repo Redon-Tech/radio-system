@@ -525,8 +525,8 @@ function main:createUi()
 
 				[Children] = {
 					UIPadding = New("UIPadding")({
-						PaddingTop = UDim.new(0, 44),
-						PaddingBottom = UDim.new(0, 4),
+						PaddingTop = UDim.new(0, 5 + systemSettings.additionalTopPadding),
+						PaddingBottom = UDim.new(0, 5),
 						PaddingLeft = UDim.new(0, 8),
 						PaddingRight = UDim.new(0, 8),
 					}),
