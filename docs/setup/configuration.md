@@ -93,6 +93,53 @@ Format:
 ```
 
 ---
+### Panic
+Controls the panic button feature.
+
+#### `settings.panicButtonEnabled`
+Controls if the panic button is enabled.
+Default Value:
+```lua
+settings.panicButtonEnabled = true
+```
+
+#### `settings.panicBehavior`
+Controls if the panic button should activate on all channels or only the active channel.
+Possible values:
+| Value  | Description                                           |
+| ------ | ----------------------------------------------------- |
+| all    | Panic button will activate on all channels            |
+| active | Panic button will only activate on the active channel |
+Default Value:
+```lua
+settings.panicBehavior = "all"
+```
+
+### `settings.getPanicMessage`
+A function that returns the message that will be sent when the panic button is pressed.
+
+Parameters:
+- `player` (Player): The player that pressed the panic button.
+
+Returns:
+Must not return nil.
+- `string`: The message that will be sent when the panic button is pressed.
+
+Default Value:
+```lua
+settings.getPanicMessage = function(player: Player): string
+	return `{player.Name} has activated the panic button!`
+end
+```
+
+### `settings.panicCooldown`
+Controls the cooldown of the panic button in seconds.
+Default Value:
+```lua
+settings.panicCooldown = 30
+```
+
+---
 ### UI
 Configurastion relating to the UI of the radio 
 
@@ -152,6 +199,8 @@ Controls audio played upon certain actions. Set any value to `nil` or `false` to
 
 The Radio system comes with audio published by parker02311, due to the audio privacy update these audios will not work by default. You can find the audio used in his videos [here](http://www.w2sjw.com/radio_sounds.html) and republish them yourself. 
 
+The panic sound is a public audio on the toolbox and should work by default.
+
 Actions:
 
 | Action          | Description                                                                                |
@@ -160,6 +209,7 @@ Actions:
 | sideTone        | When the player tries to activate voice communications while someone else is using the air |
 | keyDown         | When the player presses down the key to activate voice                                     |
 | keyUp           | The exact oppisite of the above                                                            |
+| panic           | When the panic button is pressed                                                           |
 
 ---
 ### Chat Config
@@ -172,6 +222,16 @@ This makes it easier to use the system when its UI position is in TopLeft.
 Default Value:
 ```lua
 settings.overrideWindowEnabled = true
+```
+
+### `settings.additionalTopPadding`
+Adds additional padding to the top of the chat window when the radio UI is in the TopLeft position.
+
+If the radio is not in the TopLeft position, it is recommended to set this value to 0.
+
+Default Value:
+```lua
+settings.additionalTopPadding = 50
 ```
 
 ---

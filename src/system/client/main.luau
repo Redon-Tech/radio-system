@@ -647,6 +647,10 @@ function main:createUi()
 		self.textEvents.panicButton:fire(self.activeChannel:get())
 	end)
 
+	if systemSettings.panicButtonEnabled == false then
+		ui.Container.Radio.Topbar.Panic.Visible = false
+	end
+
 	return ui
 end
 
