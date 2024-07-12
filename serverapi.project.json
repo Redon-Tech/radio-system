@@ -1,6 +1,6 @@
 {
 	"name": "Radio System Server API",
 	"tree": {
-		"$path": "apis/server.lua"
+		"$path": "apis/server.luau"
 	}
 }
