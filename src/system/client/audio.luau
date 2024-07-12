@@ -3,7 +3,7 @@
 local audio = {}
 audio.__index = audio
 
-function audio.new(main: {any}, assetId: string|boolean?, looped: boolean)
+function audio.new(main: { any }, assetId: string | boolean?, looped: boolean)
 	local data = {
 		main = main,
 		sound = Instance.new("Sound"),
@@ -18,13 +18,17 @@ function audio.new(main: {any}, assetId: string|boolean?, looped: boolean)
 end
 
 function audio:play()
-	if self.isEnabled == false then return end
+	if self.isEnabled == false then
+		return
+	end
 
 	self.sound:Play()
 end
 
 function audio:stop()
-	if self.isEnabled == false then return end
+	if self.isEnabled == false then
+		return
+	end
 
 	self.sound:Stop()
 end

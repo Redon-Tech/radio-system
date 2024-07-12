@@ -12,17 +12,21 @@ local systemSettings = require(shared:WaitForChild("settings"))
 local isServer = RunService:IsServer()
 
 local print = function(...)
-	if systemSettings.debug then print(`[RTRS {if isServer then "Server" else "Client"}]: `, ...) end
+	if systemSettings.debug then
+		print(`[RTRS {if isServer then "Server" else "Client"}]: `, ...)
+	end
 end
 local warn = function(...)
-	if systemSettings.debug then warn(`[RTRS {if isServer then "Server" else "Client"}]: `, ...) end
+	if systemSettings.debug then
+		warn(`[RTRS {if isServer then "Server" else "Client"}]: `, ...)
+	end
 end
 
 function comm.new(namespace: string)
 	print(`Initializing Comm {namespace}`)
 	local data = {
 		_commFolder = shared:WaitForChild("commEvents"),
-		namespace = namespace
+		namespace = namespace,
 	}
 	local self = setmetatable(data, comm)
 
@@ -43,7 +47,10 @@ function comm.new(namespace: string)
 end
 
 function comm.setup()
-	if isServer == false then warn("setup can't be run on client") return end
+	if isServer == false then
+		warn("setup can't be run on client")
+		return
+	end
 	print("Comm Setup Started")
 	if ReplicatedStorage:FindFirstChild("comm") then
 		warn("Attempted to setup after setup has already happened")
@@ -57,21 +64,29 @@ function comm.setup()
 end
 
 function comm:folderCheck()
-	if self.folder == nil then warn(`{self.namespace} has no folder`) return false end
+	if self.folder == nil then
+		warn(`{self.namespace} has no folder`)
+		return false
+	end
 	return true
 end
 
 function comm:remoteFunction(name: string, ...): any
-	if self:folderCheck() == false then return end
+	if self:folderCheck() == false then
+		return
+	end
 
 	if isServer == true then
-		if self.folder:FindFirstChild(name) then warn(`RemoteFunction {name} already exists.`) return end
+		if self.folder:FindFirstChild(name) then
+			warn(`RemoteFunction {name} already exists.`)
+			return
+		end
 
 		local remote = Instance.new("RemoteFunction")
 		remote.Name = name
 		remote.Parent = self.folder
 
-		local bindTo:{}|(...any)->...any, funcName:string = ...
+		local bindTo: {} | (...any) -> ...any, funcName: string = ...
 		if typeof(bindTo) == "table" then
 			remote.OnServerInvoke = function(...)
 				return bindTo[funcName](bindTo, ...) -- the first param is bindTo to pass back in self :D
@@ -86,16 +101,21 @@ function comm:remoteFunction(name: string, ...): any
 	end
 end
 
-function comm:remoteEvent(name: string, ...): {
+function comm:remoteEvent(
+	name: string,
+	...
+): {
 	remote: RemoteEvent,
-	connect: (any, func:(...any) -> ...any) -> RBXScriptConnection,
+	connect: (any, func: (...any) -> ...any) -> RBXScriptConnection,
 	fire: (...any) -> nil,
 	fireAll: ((...any) -> nil)?,
 	fireFilter: ((...any) -> nil)?,
 	fireExcept: ((...any) -> nil)?,
 	fireFor: ((...any) -> nil)?,
-}|nil
-	if self:folderCheck() == false then return end
+} | nil
+	if self:folderCheck() == false then
+		return
+	end
 
 	if isServer == true then
 		local remoteEvent = {}
@@ -118,15 +138,15 @@ function comm:remoteEvent(name: string, ...): {
 		end
 
 		function remoteEvent:fireFilter(filter: (Player, ...any) -> boolean, ...)
-			for _, player:Player in pairs(Players:GetPlayers()) do
+			for _, player: Player in pairs(Players:GetPlayers()) do
 				if filter(player, ...) then
 					self:fire(player, ...)
 				end
 			end
 		end
 
-		function remoteEvent:fireFor(players: {Player}, ...)
-			for _,player:Player in pairs(players) do
+		function remoteEvent:fireFor(players: { Player }, ...)
+			for _, player: Player in pairs(players) do
 				self:fire(player, ...)
 			end
 		end
@@ -150,10 +170,15 @@ function comm:remoteEvent(name: string, ...): {
 	end
 end
 
-function comm:bindableFunction(name: string, bindTo:{}|(...any)->...any, funcName:string): BindableFunction
-	if self:folderCheck() == false then return end
+function comm:bindableFunction(name: string, bindTo: {} | (...any) -> ...any, funcName: string): BindableFunction
+	if self:folderCheck() == false then
+		return
+	end
 
-	if self.folder:FindFirstChild(name) then warn(`BindableFunction {name} already exists.`) return end
+	if self.folder:FindFirstChild(name) then
+		warn(`BindableFunction {name} already exists.`)
+		return
+	end
 
 	local bindableFunction = Instance.new("BindableFunction")
 	bindableFunction.Name = name
@@ -169,12 +194,17 @@ function comm:bindableFunction(name: string, bindTo:{}|(...any)->...any, funcNam
 	return bindableFunction
 end
 
-function comm:bindableEvent(name: string, ...): {
+function comm:bindableEvent(
+	name: string,
+	...
+): {
 	event: BindableEvent,
-	connect: (any, func:(...any) -> ...any) -> RBXScriptConnection,
+	connect: (any, func: (...any) -> ...any) -> RBXScriptConnection,
 	fire: (...any) -> nil,
 }
-	if self:folderCheck() == false then return end
+	if self:folderCheck() == false then
+		return
+	end
 
 	local bindableEvent = {}
 	bindableEvent.__index = bindableEvent

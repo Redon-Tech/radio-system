@@ -11,10 +11,14 @@ local systemSettings = require(shared:WaitForChild("settings"))
 local comm = require(shared:WaitForChild("comm"))
 
 local print = function(...)
-	if systemSettings.debug then print(`[RTRS Server]: `, ...) end
+	if systemSettings.debug then
+		print(`[RTRS Server]: `, ...)
+	end
 end
 local warn = function(...)
-	if systemSettings.debug then warn(`[RTRS Server]: `, ...) end
+	if systemSettings.debug then
+		warn(`[RTRS Server]: `, ...)
+	end
 end
 
 function main.init()
@@ -29,16 +33,15 @@ function main.init()
 			sendHistory = textEvents:remoteEvent("sendHistory"),
 		},
 		voiceEvents = {
-			activateVoice = voiceEvents:remoteEvent("activateVoice")
+			activateVoice = voiceEvents:remoteEvent("activateVoice"),
 		},
 		apiEvents = apiEvents,
-		serverApi = apiEvents:bindableEvent("serverApi")
+		serverApi = apiEvents:bindableEvent("serverApi"),
 	}
 	local self = setmetatable(data, main)
 
 	self.channels = self:setupChannels()
 	self:setupAudio()
-
 
 	self.textEvents.clientMessage:connect(function(...)
 		self:receiveMessage(...)
@@ -50,7 +53,7 @@ function main.init()
 		self:activateVoice(...)
 		self.serverApi:fire("receivedActivateVoice", ...)
 	end)
-	
+
 	self.serverApi:connect(function(...)
 		self:serverApiEvent(...)
 	end)
@@ -61,7 +64,7 @@ end
 
 function main:authorizeClient(player: Player)
 	local authorizedChannels = {}
-	for id,channel in pairs(self.channels) do
+	for id, channel in pairs(self.channels) do
 		if channel:addPlayerWithChecks(player) then
 			table.insert(authorizedChannels, id)
 		end
@@ -93,14 +96,13 @@ function main:setupChannels()
 	print("Setting up channels")
 
 	local channels = {}
-	for id,channel in pairs(systemSettings.channels) do
+	for id, channel in pairs(systemSettings.channels) do
 		channels[id] = require(script.Parent:WaitForChild("channel")).init(self, id)
 	end
 
 	print("Channels set up")
 	return channels
 end
-
 
 function main:characterAdded(input: AudioDeviceInput, character: Model)
 	-- local emitter = Instance.new("AudioEmitter")
@@ -153,11 +155,15 @@ function main:setupAudio()
 		player.CharacterAdded:Connect(function(character)
 			self:characterAdded(input, character)
 		end)
-		if player.Character ~= nil then self:characterAdded(input, player.Character) end
+		if player.Character ~= nil then
+			self:characterAdded(input, player.Character)
+		end
 	end
 
 	Players.PlayerAdded:Connect(playerAdded)
-	for _,player in pairs(Players:GetPlayers()) do playerAdded(player) end
+	for _, player in pairs(Players:GetPlayers()) do
+		playerAdded(player)
+	end
 
 	print("Voice setup")
 end

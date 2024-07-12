@@ -5,7 +5,7 @@ local Fusion = require(shared:WaitForChild("Fusion"))
 local New, Children, OnEvent = Fusion.New, Fusion.Children, Fusion.OnEvent
 
 return function(props)
-	return New "Frame" {
+	return New("Frame")({
 		Name = "Topbar",
 		Size = UDim2.fromScale(1, 0.173),
 		BackgroundColor3 = Color3.fromRGB(30, 30, 30),
@@ -14,11 +14,11 @@ return function(props)
 		Position = UDim2.fromScale(0.5, 0),
 
 		[Children] = {
-			UICorner = New "UICorner" {
+			UICorner = New("UICorner")({
 				CornerRadius = UDim.new(0, 10),
-			},
-	
-			Frame = New "Frame" {
+			}),
+
+			Frame = New("Frame")({
 				Name = "Cover",
 				Size = UDim2.new(1, 0, 0, 10),
 				BackgroundColor3 = Color3.fromRGB(30, 30, 30),
@@ -26,9 +26,9 @@ return function(props)
 				AnchorPoint = Vector2.new(0.5, 1),
 				Position = UDim2.fromScale(0.5, 1),
 				ZIndex = 0,
-			},
+			}),
 
-			New "TextButton" {
+			New("TextButton")({
 				Name = "Title",
 				Size = UDim2.fromScale(0.2, 1),
 				BackgroundTransparency = 1,
@@ -36,17 +36,21 @@ return function(props)
 				Position = UDim2.fromScale(0.01, 0),
 
 				Text = "Radio",
-				FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
+				FontFace = Font.new(
+					"rbxasset://fonts/families/Arial.json",
+					Enum.FontWeight.Bold,
+					Enum.FontStyle.Normal
+				),
 				TextScaled = true,
 				TextColor3 = Color3.fromRGB(255, 255, 255),
 				TextXAlignment = Enum.TextXAlignment.Left,
 
-				[OnEvent "Activated"] = function()
+				[OnEvent("Activated")] = function()
 					props.visible:set(false)
-				end
-			},
+				end,
+			}),
 
-			New "ImageButton" {
+			New("ImageButton")({
 				Name = "Chat",
 				Size = UDim2.fromScale(0.05, 0.6),
 				BackgroundTransparency = 1,
@@ -54,10 +58,10 @@ return function(props)
 				Position = UDim2.fromScale(0.911, 0.5),
 				Image = "rbxassetid://16516253569",
 				ImageColor3 = Color3.fromRGB(255, 0, 0),
-				ScaleType = Enum.ScaleType.Fit
-			},
+				ScaleType = Enum.ScaleType.Fit,
+			}),
 
-			New "ImageButton" {
+			New("ImageButton")({
 				Name = "Mic",
 				Size = UDim2.fromScale(0.05, 0.6),
 				BackgroundTransparency = 1,
@@ -65,8 +69,8 @@ return function(props)
 				Position = UDim2.fromScale(0.975, 0.5),
 				Image = "rbxassetid://16516226674",
 				ImageColor3 = Color3.fromRGB(255, 0, 0),
-				ScaleType = Enum.ScaleType.Fit
-			}
-		}
-	}
+				ScaleType = Enum.ScaleType.Fit,
+			}),
+		},
+	})
 end

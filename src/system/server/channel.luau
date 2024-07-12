@@ -11,7 +11,6 @@ type SystemMessage = {
 	sideAccent: Color3?,
 }
 
-
 local channel = {}
 channel.__index = channel
 
@@ -22,13 +21,17 @@ local shared = ReplicatedStorage:WaitForChild("radioShared")
 local systemSettings = require(shared:WaitForChild("settings"))
 
 local print = function(...)
-	if systemSettings.debug then print(`[RTRS Server]: `, ...) end
+	if systemSettings.debug then
+		print(`[RTRS Server]: `, ...)
+	end
 end
 local warn = function(...)
-	if systemSettings.debug then warn(`[RTRS Server]: `, ...) end
+	if systemSettings.debug then
+		warn(`[RTRS Server]: `, ...)
+	end
 end
 
-function channel.init(main:{any}, id: number)
+function channel.init(main: { any }, id: number)
 	print(`Initializing Channel {id}`)
 	local data = {
 		main = main,
@@ -36,14 +39,17 @@ function channel.init(main:{any}, id: number)
 		name = systemSettings.channels[id].name,
 		messages = {}, -- UNFILTERED
 		teams = {},
-		isDefaultChannel = (typeof(systemSettings.default) == "boolean" and systemSettings.default == true) or (typeof(systemSettings.default) == "table" and table.find(systemSettings.default, id)),
+		isDefaultChannel = (typeof(systemSettings.default) == "boolean" and systemSettings.default == true)
+			or (typeof(systemSettings.default) == "table" and table.find(systemSettings.default, id)),
 		players = {},
 		activeVoice = nil,
 	}
 	local self = setmetatable(data, channel)
 
-	for team,access in pairs(systemSettings.teams) do
-		if (typeof(access) == "boolean" and access == true) or (typeof(access) == "table" and table.find(access, id)) then
+	for team, access in pairs(systemSettings.teams) do
+		if
+			(typeof(access) == "boolean" and access == true) or (typeof(access) == "table" and table.find(access, id))
+		then
 			self.teams[team] = true
 		end
 	end
@@ -59,7 +65,9 @@ end
 -- Text Features
 
 function channel:_addMessageToHistory(player: Player?, message: string)
-	if systemSettings.channelHistory == 0 then return end
+	if systemSettings.channelHistory == 0 then
+		return
+	end
 
 	if player == nil then
 		player = "System"
@@ -99,7 +107,10 @@ end
 -- Voice Features
 
 function channel:activateVoice(player: Player)
-	if self.activeVoice ~= nil and self.activeVoice ~= player then warn(`{player} tried to activate voice while channel is already in use, ignoring.`) return end
+	if self.activeVoice ~= nil and self.activeVoice ~= player then
+		warn(`{player} tried to activate voice while channel is already in use, ignoring.`)
+		return
+	end
 	if self.players[player] == nil then
 		warn(`{player.Name} is not apart of {self.name}`)
 		return
@@ -107,8 +118,9 @@ function channel:activateVoice(player: Player)
 
 	self.activeVoice = if self.activeVoice == player then nil else player
 	self.main.voiceEvents.activateVoice:fireAll(self.id, self.activeVoice)
-	self.wire.SourceInstance = if self.activeVoice ~= nil and self.activeVoice.Character ~= nil then
-		self.activeVoice.Character.HumanoidRootPart:FindFirstChild("RSListener") else nil
+	self.wire.SourceInstance = if self.activeVoice ~= nil and self.activeVoice.Character ~= nil
+		then self.activeVoice.Character.HumanoidRootPart:FindFirstChild("RSListener")
+		else nil
 	print(self.activeVoice, self.wire.SourceInstance)
 end
 
@@ -116,7 +128,7 @@ end
 
 function channel:addPlayer(player: Player)
 	local playerHistory = {}
-	for _,message in pairs(self.messages) do
+	for _, message in pairs(self.messages) do
 		local success, filteredMessage = pcall(function()
 			return Chat:FilterStringAsync(message.message, message.player, message.player)
 		end)
@@ -127,7 +139,7 @@ function channel:addPlayer(player: Player)
 		table.insert(playerHistory, {
 			player = message.player,
 			message = filteredMessage,
-			color = message.color
+			color = message.color,
 		})
 	end
 	self.main.textEvents.sendHistory:fire(player, self.id, playerHistory)
@@ -156,12 +168,19 @@ function channel:removePlayer(player: Player)
 end
 
 function channel:addPlayerWithChecks(player: Player): boolean
-	if (typeof(systemSettings.users[player.UserId]) == "boolean" and systemSettings.users[player.UserId] == true)
-	or (typeof(systemSettings.users[player.UserId]) == "table" and table.find(systemSettings.users[player.UserId], self.id))
-	or (typeof(systemSettings.users[player.Name]) == "boolean" and systemSettings.users[player.Name] == true)
-	or (typeof(systemSettings.users[player.Name]) == "table" and table.find(systemSettings.users[player.Name], self.id))
-	or (player.Team ~= nil and self.teams[player.Team.Name] == true)
-	or (self.isDefaultChannel)
+	if
+		(typeof(systemSettings.users[player.UserId]) == "boolean" and systemSettings.users[player.UserId] == true)
+		or (typeof(systemSettings.users[player.UserId]) == "table" and table.find(
+			systemSettings.users[player.UserId],
+			self.id
+		))
+		or (typeof(systemSettings.users[player.Name]) == "boolean" and systemSettings.users[player.Name] == true)
+		or (typeof(systemSettings.users[player.Name]) == "table" and table.find(
+			systemSettings.users[player.Name],
+			self.id
+		))
+		or (player.Team ~= nil and self.teams[player.Team.Name] == true)
+		or self.isDefaultChannel
 	then
 		self:addPlayer(player)
 		return true

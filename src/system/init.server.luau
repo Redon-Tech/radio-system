@@ -15,7 +15,6 @@ local systemSettings = require(settings)
 
 print(`\n		[RTRS]: Initializing System\n		Version: {systemSettings.v}\n		Debug Mode: {systemSettings.debug}`)
 
-
 local sharedFolder = script.shared
 sharedFolder.Name = "radioShared"
 sharedFolder.Parent = game.ReplicatedStorage
@@ -34,7 +33,9 @@ settings.Parent = sharedFolder
 
 local function initClient(Player: Player)
 	local PlayerGui = Player:WaitForChild("PlayerGui")
-	if PlayerGui:FindFirstChild("radioClient") then return end
+	if PlayerGui:FindFirstChild("radioClient") then
+		return
+	end
 
 	local radioClient = script.client:Clone()
 	radioClient.Name = "radioClient"

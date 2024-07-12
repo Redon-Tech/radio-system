@@ -59,11 +59,17 @@ settings.default = false
 
 settings.teams = {
 	["Police"] = {
-		1, 2, 3, 4,
+		1,
+		2,
+		3,
+		4,
 	},
 	["Fire"] = {
-		1, 2, 3, 5,
-	}
+		1,
+		2,
+		3,
+		5,
+	},
 }
 
 settings.users = {
@@ -95,7 +101,7 @@ settings.uiMaxSize = Vector2.new(475, 275) -- Same as new TextChatService defaul
 settings.keybinds = {
 	text = Enum.KeyCode.T,
 	mic = Enum.KeyCode.Y,
-	hide = Enum.KeyCode.H -- You can also click the "Radio" text
+	hide = Enum.KeyCode.H, -- You can also click the "Radio" text
 }
 
 --[[

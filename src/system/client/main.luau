@@ -19,7 +19,8 @@ local comm = require(shared:WaitForChild("comm"))
 local components = script.Parent:WaitForChild("components")
 local audio = require(script.Parent:WaitForChild("audio"))
 
-local New, Children, Value, ForPairs, Observer, OnEvent = Fusion.New, Fusion.Children, Fusion.Value, Fusion.ForPairs, Fusion.Observer, Fusion.OnEvent
+local New, Children, Value, ForPairs, Observer, OnEvent =
+	Fusion.New, Fusion.Children, Fusion.Value, Fusion.ForPairs, Fusion.Observer, Fusion.OnEvent
 local radioTopbar = require(components:WaitForChild("radioTopbar"))
 local radioChannels = require(components:WaitForChild("radioChannels"))
 local radioChannel = require(components:WaitForChild("radioChannel"))
@@ -27,10 +28,14 @@ local messages = require(components:WaitForChild("messages"))
 local message = require(components:WaitForChild("message"))
 
 local print = function(...)
-	if systemSettings.debug then print(`[RTRS Client]: `, ...) end
+	if systemSettings.debug then
+		print(`[RTRS Client]: `, ...)
+	end
 end
 local warn = function(...)
-	if systemSettings.debug then warn(`[RTRS Client]: `, ...) end
+	if systemSettings.debug then
+		warn(`[RTRS Client]: `, ...)
+	end
 end
 
 function main.init()
@@ -53,7 +58,7 @@ function main.init()
 		},
 		voiceEvents = {
 			comm = voiceEvents,
-			activateVoice = voiceEvents:remoteEvent("activateVoice")
+			activateVoice = voiceEvents:remoteEvent("activateVoice"),
 		},
 		apiEvents = apiEvents,
 		clientApi = apiEvents:bindableEvent("clientApi"),
@@ -124,7 +129,9 @@ function main:setupEvents()
 	end)
 
 	UserInputService.InputBegan:Connect(function(input, robloxProcessedEvent)
-		if robloxProcessedEvent == true then return end
+		if robloxProcessedEvent == true then
+			return
+		end
 		if input.KeyCode == systemSettings.keybinds.text then
 			self.textActive:set(not self.textActive:get())
 		elseif input.KeyCode == systemSettings.keybinds.mic then
@@ -135,7 +142,9 @@ function main:setupEvents()
 	end)
 
 	UserInputService.InputEnded:Connect(function(input, robloxProcessedEvent)
-		if robloxProcessedEvent == true then return end
+		if robloxProcessedEvent == true then
+			return
+		end
 		if input.KeyCode == systemSettings.keybinds.mic then
 			self.voiceActive:set(false)
 		end
@@ -201,14 +210,18 @@ function main:setupObservers()
 
 	textActiveObserver:onChange(function()
 		local textActive = self.textActive:get()
-		self.mainUi.Container.Radio.Topbar.Chat.Image = textActive and "rbxassetid://16516225857" or "rbxassetid://16516253569"
-		self.mainUi.Container.Radio.Topbar.Chat.ImageColor3 = textActive and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 0, 0)
+		self.mainUi.Container.Radio.Topbar.Chat.Image = textActive and "rbxassetid://16516225857"
+			or "rbxassetid://16516253569"
+		self.mainUi.Container.Radio.Topbar.Chat.ImageColor3 = textActive and Color3.fromRGB(255, 255, 255)
+			or Color3.fromRGB(255, 0, 0)
 	end)
 
 	voiceActiveObserver:onChange(function()
 		local voiceActive = self.voiceActive:get()
-		self.mainUi.Container.Radio.Topbar.Mic.Image = voiceActive and "rbxassetid://16516224290" or "rbxassetid://16516226674"
-		self.mainUi.Container.Radio.Topbar.Mic.ImageColor3 = voiceActive and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 0, 0)
+		self.mainUi.Container.Radio.Topbar.Mic.Image = voiceActive and "rbxassetid://16516224290"
+			or "rbxassetid://16516226674"
+		self.mainUi.Container.Radio.Topbar.Mic.ImageColor3 = voiceActive and Color3.fromRGB(255, 255, 255)
+			or Color3.fromRGB(255, 0, 0)
 
 		if voiceActive == true and self.enabled:get() == true then
 			if self.activeVoice:get() == nil then
@@ -249,7 +262,7 @@ function main:setupObservers()
 		local enabled = self.enabled:get()
 		setVisible(enabled)
 		self.visible:set(enabled)
-		
+
 		if enabled == true then
 			if systemSettings.overrideWindowEnabled == true then
 				if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
@@ -276,7 +289,7 @@ function main:setupChannels()
 	print("Setting up channels")
 
 	local channels = {}
-	for id,channel in pairs(systemSettings.channels) do
+	for id, channel in pairs(systemSettings.channels) do
 		local messages = Value({})
 		channels[id] = messages
 
@@ -298,7 +311,7 @@ end
 function main:requestAuthorizedChannels()
 	local success, error = pcall(function()
 		local authorizedChannels = {}
-		for _,channelId in pairs(self.textEvents.comm:remoteFunction("authorize")) do
+		for _, channelId in pairs(self.textEvents.comm:remoteFunction("authorize")) do
 			authorizedChannels[channelId] = systemSettings.channels[channelId]
 		end
 		self.authorizedChannels:set(authorizedChannels)
@@ -308,7 +321,7 @@ function main:requestAuthorizedChannels()
 		else
 			self.enabled:set(true)
 			if authorizedChannels[self.activeChannel:get()] == nil then
-				for channelId,_ in pairs(authorizedChannels) do
+				for channelId, _ in pairs(authorizedChannels) do
 					self.activeChannel:set(channelId)
 					break
 				end
@@ -325,7 +338,9 @@ end
 function main:activeChannelChange()
 	local activeChannel = self.activeChannel:get()
 	self.activeMessages:set(table.clone(self.channels[activeChannel]:get()))
-	if self.activeWire:get() then self.activeWire:get().TargetInstance = nil end
+	if self.activeWire:get() then
+		self.activeWire:get().TargetInstance = nil
+	end
 	if localPlayer.Character ~= nil then
 		local wire = shared:WaitForChild("wires"):WaitForChild(activeChannel)
 		wire.TargetInstance = audioEqualizer
@@ -351,14 +366,18 @@ function main:recieveChannelHistory(channelId: number, history: {})
 		return
 	end
 	local newHistory = {}
-	for _,message in pairs(history) do
+	for _, message in pairs(history) do
 		table.insert(newHistory, {
 			id = #newHistory + 1,
-			icon = game.Players:GetUserThumbnailAsync(message.player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48),
+			icon = game.Players:GetUserThumbnailAsync(
+				message.player.UserId,
+				Enum.ThumbnailType.HeadShot,
+				Enum.ThumbnailSize.Size48x48
+			),
 			iconRounded = true,
 			headerText = message.player.Name,
 			text = message.message,
-			sideAccent = message.color
+			sideAccent = message.color,
 		})
 	end
 	channel:set(newHistory)
@@ -377,11 +396,15 @@ function main:receiveClientMessage(channelId: number, player: Player, message: s
 	local channelMessages = channel:get()
 	local messageData = {
 		id = #channelMessages + 1,
-		icon = game.Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48),
+		icon = game.Players:GetUserThumbnailAsync(
+			player.UserId,
+			Enum.ThumbnailType.HeadShot,
+			Enum.ThumbnailSize.Size48x48
+		),
 		iconRounded = true,
 		headerText = player.Name,
 		text = message,
-		sideAccent = player.TeamColor.Color
+		sideAccent = player.TeamColor.Color,
 	}
 	table.insert(channelMessages, messageData)
 	channel:set(channelMessages)
@@ -394,16 +417,19 @@ function main:receiveClientMessage(channelId: number, player: Player, message: s
 	end
 end
 
-function main:receiveMessage(channelId: number, message: {
-	text: string,
-	headerText: string?,
-	backgroundColor3: Color3?,
-	icon: string?,
-	iconColor3: Color3?,
-	iconRounded: boolean?,
-	sideText: string?,
-	sideAccent: Color3?,
-})
+function main:receiveMessage(
+	channelId: number,
+	message: {
+		text: string,
+		headerText: string?,
+		backgroundColor3: Color3?,
+		icon: string?,
+		iconColor3: Color3?,
+		iconRounded: boolean?,
+		sideText: string?,
+		sideAccent: Color3?,
+	}
+)
 	local channel = self.channels[channelId]
 	if channel == nil then
 		warn("Received message for non-existant channel")
@@ -412,9 +438,9 @@ function main:receiveMessage(channelId: number, message: {
 
 	local channelMessages = channel:get()
 	local messageData = {
-		id = #channelMessages + 1
+		id = #channelMessages + 1,
 	}
-	for i,v in pairs(message) do
+	for i, v in pairs(message) do
 		messageData[i] = v
 	end
 	table.insert(channelMessages, messageData)
@@ -445,13 +471,13 @@ elseif typeof(systemSettings.overrideUiPosition) == "UDim2" then
 end
 
 function main:createUi()
-	local ui = New "ScreenGui" {
+	local ui = New("ScreenGui")({
 		Name = "radioClient",
 		Parent = localPlayer:WaitForChild("PlayerGui"),
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 
 		[Children] = {
-			Container = New "Frame" {
+			Container = New("Frame")({
 				Name = "Container",
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
@@ -459,50 +485,54 @@ function main:createUi()
 				Position = UDim2.fromScale(0.5, 0.5),
 
 				[Children] = {
-					UIPadding = New "UIPadding" {
+					UIPadding = New("UIPadding")({
 						PaddingTop = UDim.new(0, 44),
 						PaddingBottom = UDim.new(0, 4),
 						PaddingLeft = UDim.new(0, 8),
 						PaddingRight = UDim.new(0, 8),
-					},
+					}),
 
-					ShowRadio = New "TextButton" {
+					ShowRadio = New("TextButton")({
 						Name = "ShowRadio",
 						Size = UDim2.fromScale(0.084, 0.037),
 						BackgroundColor3 = Color3.fromRGB(40, 40, 40),
-						AnchorPoint = Vector2.new(0,1),
+						AnchorPoint = Vector2.new(0, 1),
 						Position = UDim2.fromScale(0, 1),
 						Visible = false,
 
 						Text = "Show Radio",
-						FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
+						FontFace = Font.new(
+							"rbxasset://fonts/families/Arial.json",
+							Enum.FontWeight.Bold,
+							Enum.FontStyle.Normal
+						),
 						TextScaled = true,
 						TextColor3 = Color3.fromRGB(255, 255, 255),
 						TextXAlignment = Enum.TextXAlignment.Center,
 
-						[OnEvent "Activated"] = function()
+						[OnEvent("Activated")] = function()
 							self.visible:set(true)
 						end,
 
 						[Children] = {
-							UICorner = New "UICorner" {
+							UICorner = New("UICorner")({
 								CornerRadius = UDim.new(0, 10),
-							},
+							}),
 
-							UISizeConstraint = New "UISizeConstraint" {
-								MaxSize = Vector2.new(200, 50)
-							},
+							UISizeConstraint = New("UISizeConstraint")({
+								MaxSize = Vector2.new(200, 50),
+							}),
 
-							UIPadding = New "UIPadding" {
+							UIPadding = New("UIPadding")({
 								PaddingTop = UDim.new(0, 3),
 								PaddingBottom = UDim.new(0, 3),
 								PaddingLeft = UDim.new(0, 3),
 								PaddingRight = UDim.new(0, 3),
-							}
-						}
-					},
+							}),
+						},
+					}),
 
-					Radio = New "Frame" {
+					Radio = New("Frame")({
 						Name = "Radio",
 						Size = systemSettings.uiSize,
 						BackgroundColor3 = Color3.fromRGB(40, 40, 40),
@@ -512,52 +542,54 @@ function main:createUi()
 						Visible = false,
 
 						[Children] = {
-							UICorner = New "UICorner" {
+							UICorner = New("UICorner")({
 								CornerRadius = UDim.new(0, 10),
-							},
+							}),
 
-							UISizeConstraint = New "UISizeConstraint" {
-								MaxSize = systemSettings.uiMaxSize
-							},
+							UISizeConstraint = New("UISizeConstraint")({
+								MaxSize = systemSettings.uiMaxSize,
+							}),
 
-							Topbar = radioTopbar {
+							Topbar = radioTopbar({
 								visible = self.visible,
-							},
-							Channels = radioChannels {
+							}),
+							Channels = radioChannels({
 								[Children] = {
 									ForPairs(self.authorizedChannels, function(id, channel)
-										return id, radioChannel {
-											Id = id,
-											Text = channel.name,
-											activeChannel = self.activeChannel,
-										}
-									end, Fusion.cleanup)
-								}
-							},
-							Messages = messages {
+										return id,
+											radioChannel({
+												Id = id,
+												Text = channel.name,
+												activeChannel = self.activeChannel,
+											})
+									end, Fusion.cleanup),
+								},
+							}),
+							Messages = messages({
 								[Children] = {
 									ForPairs(self.activeMessages, function(id, messageData)
-										return id, message {
-											id = id,
-											backgroundColor3 = messageData.backgroundColor3,
-											icon = messageData.icon,
-											iconRounded = messageData.iconRounded,
-											iconColor3 = messageData.iconColor3,
-											sideText = messageData.sideText,
-											sideAccent = messageData.sideAccent,
-											headerText = messageData.headerText,
-											text = messageData.text,
-											richText = messageData.richText,
-										}
-									end, Fusion.cleanup)
-								}
-							}
+										return id,
+											message({
+												id = id,
+												backgroundColor3 = messageData.backgroundColor3,
+												icon = messageData.icon,
+												iconRounded = messageData.iconRounded,
+												iconColor3 = messageData.iconColor3,
+												sideText = messageData.sideText,
+												sideAccent = messageData.sideAccent,
+												headerText = messageData.headerText,
+												text = messageData.text,
+												richText = messageData.richText,
+											})
+									end, Fusion.cleanup),
+								},
+							}),
 						},
-					},
-				}
-			}
-		}
-	}
+					}),
+				},
+			}),
+		},
+	})
 
 	ui.Container.Radio.Topbar.Chat.MouseButton1Click:Connect(function()
 		self.textActive:set(not self.textActive:get())

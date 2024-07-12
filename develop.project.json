@@ -7,10 +7,10 @@
 				"$path": "src"
 			},
 			"server": {
-				"$path": "dev/server.server.lua"
+				"$path": "dev/server.server.luau"
 			},
 			"Radio System Server API": {
-				"$path": "apis/server.lua"
+				"$path": "apis/server.luau"
 			}
 		},
 		"ReplicatedStorage": {
@@ -18,13 +18,13 @@
 				"$className": "RemoteEvent"
 			},
 			"Radio System Client API": {
-				"$path": "apis/client.lua"
+				"$path": "apis/client.luau"
 			}
 		},
 		"StarterPlayer": {
 			"StarterPlayerScripts": {
 				"client": {
-					"$path": "dev/client.client.lua"
+					"$path": "dev/client.client.luau"
 				}
 			}
 		},
