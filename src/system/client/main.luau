@@ -128,6 +128,7 @@ function main:setupEvents()
 		if message == "getEnabled" then
 			return self.enabled:get()
 		end
+		return
 	end)
 
 	self.clientApi:connect(function(message: string, ...)

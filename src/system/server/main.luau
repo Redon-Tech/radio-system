@@ -142,6 +142,8 @@ function main:characterAdded(input: AudioDeviceInput, character: Model)
 	-- wire.TargetInstance = emitter
 	-- wire.Parent = emitter
 
+	local rootPart = character:WaitForChild("HumanoidRootPart")
+
 	local emitter = Instance.new("AudioEmitter")
 	emitter.Name = "emitterForListener"
 	emitter.AudioInteractionGroup = "RadioSystem"
@@ -155,13 +157,13 @@ function main:characterAdded(input: AudioDeviceInput, character: Model)
 	local radioEmitter = Instance.new("AudioEmitter")
 	radioEmitter.Name = "RSEmitter"
 	radioEmitter.Parent = character
-	local wire = Instance.new("Wire")
-	wire.TargetInstance = radioEmitter
-	wire.Parent = radioEmitter
+	local wire2 = Instance.new("Wire")
+	wire2.TargetInstance = radioEmitter
+	wire2.Parent = radioEmitter
 	local radioListener = Instance.new("AudioListener")
 	radioListener.Name = "RSListener"
 	radioListener.AudioInteractionGroup = "RadioSystem"
-	radioListener.Parent = character.HumanoidRootPart
+	radioListener.Parent = rootPart
 end
 
 function main:setupAudio()

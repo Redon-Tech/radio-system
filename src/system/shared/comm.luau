@@ -170,7 +170,7 @@ function comm:remoteEvent(
 	end
 end
 
-function comm:bindableFunction(name: string, bindTo: {} | (...any) -> ...any, funcName: string): BindableFunction
+function comm:bindableFunction(name: string, bindTo: {} | (...any) -> ...any, funcName: string): BindableFunction?
 	if self:folderCheck() == false then
 		return
 	end
@@ -198,10 +198,9 @@ function comm:bindableEvent(
 	name: string,
 	...
 ): {
-	event: BindableEvent,
 	connect: (any, func: (...any) -> ...any) -> RBXScriptConnection,
 	fire: (...any) -> nil,
-}
+}?
 	if self:folderCheck() == false then
 		return
 	end

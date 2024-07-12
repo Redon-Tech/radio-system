@@ -16,6 +16,9 @@ return function(props)
 
 		[OnEvent("ChildAdded")] = function(child: TextButton)
 			if child:IsA("TextButton") then
+				if frame == nil then
+					return
+				end
 				for _, v in pairs(frame:GetChildren()) do
 					if v:IsA("TextButton") then
 						v.Size = UDim2.fromScale(1 / (#frame:GetChildren() - 1), 1)
@@ -34,6 +37,10 @@ return function(props)
 			props[Children],
 		},
 	})
+
+	if frame == nil then
+		return
+	end
 
 	for _, v in pairs(frame:GetChildren()) do
 		if v:IsA("TextButton") then

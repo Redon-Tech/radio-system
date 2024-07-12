@@ -1,4 +1,3 @@
-local ProximityPromptService = game:GetService("ProximityPromptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local shared = ReplicatedStorage:WaitForChild("radioShared")
 local Fusion = require(shared:WaitForChild("Fusion"))
@@ -117,12 +116,13 @@ return function(props)
 	local connections = {}
 
 	connections[#connections + 1] = message.AncestryChanged:Connect(function()
-		if message.Parent ~= nil then
+		local text = message:FindFirstChild("Text")
+		if message.Parent ~= nil and text ~= nil then
 			message.Size = UDim2.new(
 				1,
 				0,
 				0,
-				math.max(60, util.getMessageHeight(message.Text, message, message.AbsoluteSize.X - 65) + 20 + (5 * 2))
+				math.max(60, util.getMessageHeight(text, message, message.AbsoluteSize.X - 65) + 20 + (5 * 2))
 			)
 		end
 	end)

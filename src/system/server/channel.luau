@@ -69,14 +69,10 @@ function channel:_addMessageToHistory(player: Player?, message: string)
 		return
 	end
 
-	if player == nil then
-		player = "System"
-	end
-
 	table.insert(self.messages, {
-		player = player,
+		player = if player ~= nil then player else "System",
 		message = message,
-		color = player.TeamColor.Color,
+		color = if player ~= nil then player.TeamColor.Color else Color3.new(),
 	})
 
 	if #self.messages >= systemSettings.channelHistory then
