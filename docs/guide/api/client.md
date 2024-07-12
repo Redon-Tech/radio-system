@@ -164,6 +164,46 @@ end)
 ```
 
 ---
+### textActivateChanged
+Calls the function whenever we the player activated or deactivated the text chat.
+```lua
+(
+    func: (active: boolean) -> nil
+) -> ScriptConnection
+```
+
+#### Parameters
+
+- `func: (active: boolean) -> nil` - a function that accepts a boolean as its parameters and returns nil.
+
+#### Example Usage
+```lua
+clientAPI:clientMessageRecieved(function(active: boolean)
+    print(active)
+end)
+```
+
+---
+### voiceActivateChanged
+Calls the function whenever we the player activated or deactivated the voice chat.
+```lua
+(
+    func: (active: boolean) -> nil
+) -> ScriptConnection
+```
+
+#### Parameters
+
+- `func: (active: boolean) -> nil` - a function that accepts a boolean as its parameters and returns nil.
+
+#### Example Usage
+```lua
+clientAPI:clientMessageRecieved(function(active: boolean)
+    print(active)
+end)
+```
+
+---
 ### getEnabled
 Returns wether or not the radio is currently enabled
 ```lua

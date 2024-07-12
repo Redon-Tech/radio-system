@@ -210,6 +210,7 @@ function main:setupObservers()
 
 	textActiveObserver:onChange(function()
 		local textActive = self.textActive:get()
+		self.clientApi:fire("textActivateChange", textActive)
 		self.mainUi.Container.Radio.Topbar.Chat.Image = textActive and "rbxassetid://16516225857"
 			or "rbxassetid://16516253569"
 		self.mainUi.Container.Radio.Topbar.Chat.ImageColor3 = textActive and Color3.fromRGB(255, 255, 255)
@@ -222,6 +223,7 @@ function main:setupObservers()
 			or "rbxassetid://16516226674"
 		self.mainUi.Container.Radio.Topbar.Mic.ImageColor3 = voiceActive and Color3.fromRGB(255, 255, 255)
 			or Color3.fromRGB(255, 0, 0)
+		self.clientApi:fire("voiceActivateChange", voiceActive)
 
 		if voiceActive == true and self.enabled:get() == true then
 			if self.activeVoice:get() == nil then

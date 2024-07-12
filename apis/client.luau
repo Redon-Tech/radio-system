@@ -101,6 +101,14 @@ function client:sendMessage(func: (channelId: number, message: string) -> nil): 
 	return self:_connect("sendMessage", func)
 end
 
+function client:textActivateChanged(func: (active: boolean) -> nil): ScriptConnection
+	return self:_connect("textActivateChanged", func)
+end
+
+function client:voiceActivateChanged(func: (active: boolean) -> nil): ScriptConnection
+	return self:_connect("voiceActivateChanged", func)
+end
+
 function client:getEnabled(): boolean
 	return self.apiEvents.folder:WaitForChild("clientApiFunction"):Invoke("getEnabled")
 end
