@@ -166,7 +166,7 @@ settings.overrideWindowEnabled = true
 
 --[[
 	Adds padding to the UI to account for the chat window
-	Recommended to set to 5 if not using TopLeft position
+	Recommended to set to 0 if not using TopLeft position
 
 	Default is 50
 ]]
