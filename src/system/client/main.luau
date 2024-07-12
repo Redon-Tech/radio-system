@@ -54,6 +54,7 @@ function main.init()
 			comm = textEvents,
 			clientMessage = textEvents:remoteEvent("clientMessage"),
 			systemMessage = textEvents:remoteEvent("systemMessage"),
+			panicButton = textEvents:remoteEvent("panicButton"),
 			sendHistory = textEvents:remoteEvent("sendHistory"),
 		},
 		voiceEvents = {
@@ -84,11 +85,13 @@ function main.init()
 	self.sideTone = audio.new(self, systemSettings.audio.sideTone, true)
 	self.keyDown = audio.new(self, systemSettings.audio.keyDown, false)
 	self.keyUp = audio.new(self, systemSettings.audio.keyUp, false)
+	self.panic = audio.new(self, systemSettings.audio.panic, false)
 	if localPlayer.Character then
 		self.messageRecieved:setParent(localPlayer.Character.HumanoidRootPart)
 		self.sideTone:setParent(localPlayer.Character.HumanoidRootPart)
 		self.keyDown:setParent(localPlayer.Character.HumanoidRootPart)
 		self.keyUp:setParent(localPlayer.Character.HumanoidRootPart)
+		self.panic:setParent(localPlayer.Character.HumanoidRootPart)
 	end
 
 	print("Initialized Client")
@@ -109,6 +112,11 @@ function main:setupEvents()
 	self.textEvents.sendHistory:connect(function(channelId, history: {})
 		self:recieveChannelHistory(channelId, history)
 		self.clientApi:fire("messageHistoryRecieved", channelId, history)
+	end)
+
+	self.textEvents.panicButton:connect(function(...)
+		self:recievePanicButton(...)
+		self.clientApi:fire("panicButtonActivated", ...)
 	end)
 
 	self.voiceEvents.activateVoice:connect(function(channelId, player)
@@ -185,6 +193,7 @@ function main:setupEvents()
 		self.sideTone:setParent(character.HumanoidRootPart)
 		self.keyDown:setParent(character.HumanoidRootPart)
 		self.keyUp:setParent(character.HumanoidRootPart)
+		self.panic:setParent(character.HumanoidRootPart)
 	end)
 end
 
@@ -430,7 +439,8 @@ function main:receiveMessage(
 		iconRounded: boolean?,
 		sideText: string?,
 		sideAccent: Color3?,
-	}
+	},
+	playPanicSound: boolean?
 )
 	local channel = self.channels[channelId]
 	if channel == nil then
@@ -452,7 +462,34 @@ function main:receiveMessage(
 		local activeMessages = self.activeMessages:get()
 		table.insert(activeMessages, messageData)
 		self.activeMessages:set(activeMessages)
-		self.messageRecieved:play()
+		if playPanicSound == true then
+			self.panic:play()
+		else
+			self.messageRecieved:play()
+		end
+	end
+end
+
+function main:recievePanicButton(channelId: number | boolean, player: Player, message: string)
+	local panicMessage = {
+		text = message,
+		headerText = player.Name,
+		backgroundColor3 = Color3.fromRGB(175, 60, 60),
+		icon = game.Players:GetUserThumbnailAsync(
+			player.UserId,
+			Enum.ThumbnailType.HeadShot,
+			Enum.ThumbnailSize.Size48x48
+		),
+		iconRounded = true,
+		sideAccent = player.TeamColor.Color,
+	}
+
+	if channelId == true then
+		for id, _ in pairs(self.authorizedChannels:get()) do
+			self:receiveMessage(id, panicMessage, true)
+		end
+	else
+		self:receiveMessage(channelId, panicMessage, true)
 	end
 end
 
@@ -603,6 +640,10 @@ function main:createUi()
 
 	ui.Container.Radio.Topbar.Mic.MouseButton1Up:Connect(function()
 		self.voiceActive:set(false)
+	end)
+
+	ui.Container.Radio.Topbar.Panic.MouseButton1Click:Connect(function()
+		self.textEvents.panicButton:fire(self.activeChannel:get())
 	end)
 
 	return ui

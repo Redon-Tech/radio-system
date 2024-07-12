@@ -104,6 +104,31 @@ end)
 ```
 
 ---
+### panicButtonActivated
+Calls the function whenever we recieve a panic button activation. 
+
+`channelId` is true if the panic button was activated on all channels.
+```lua
+(
+    func: (channelId: number | boolean, player: Player, message: string) -> nil
+) -> ScriptConnection
+
+#### Parameters
+
+- `func: (channelId: number | boolean, player: Player, message: string) -> nil` - a function that accepts a number or boolean, player, and message as its parameters and returns nil.
+
+#### Example Usage
+```lua
+clientAPI:clientMessageRecieved(function(channelId: number | boolean, player: Player, message: string)
+    if channelId == true then
+        print("Panic Button Activated on all channels")
+    else
+        print(channelId, player, message)
+    end
+end)
+```
+
+---
 ### messageHistoryRecieved
 Calls the function whenever we recieve a channels history, usually calls whenver the player recieves the GUI.
 ```lua

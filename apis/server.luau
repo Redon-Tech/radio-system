@@ -77,6 +77,10 @@ function server:receivedActivateVoice(func: (player: Player, channelId: number) 
 	return self:_connect("receivedActivateVoice", func)
 end
 
+function server:receivedPanic(func: (player: Player, channelId: number) -> nil): ScriptConnection
+	return self:_connect("receivedPanic", func)
+end
+
 function server:authorizedClient(func: (player: Player, authorizedChannels: { number }) -> nil): ScriptConnection
 	return self:_connect("authorizedClient", func)
 end

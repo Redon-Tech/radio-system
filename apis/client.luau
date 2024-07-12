@@ -89,6 +89,12 @@ function client:systemMessageRecieved(func: (
 	return self:_connect("systemMessageRecieved", func)
 end
 
+function client:panicButtonActivated(
+	func: (channelId: number | boolean, player: Player, message: string) -> nil
+): ScriptConnection
+	return self:_connect("panicButtonActivated", func)
+end
+
 function client:messageHistoryRecieved(func: (channelId: number, history: {}) -> nil): ScriptConnection
 	return self:_connect("messageHistoryRecieved", func)
 end

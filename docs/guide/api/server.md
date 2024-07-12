@@ -95,6 +95,26 @@ end)
 ```
 
 ---
+### receivedPanic
+Calls the function whenever a player successfully uses the panic button.
+```lua
+(
+    func: (player: Player, channelId: number) -> nil
+) -> ScriptConnection
+```
+
+#### Parameters
+
+- `func: (player: Player, channelId: number) -> nil` - a function that accepts a Player and number as its parameters and returns nil.
+
+#### Example Usage
+```lua
+serverAPI:receivedPanic(function(player: Player, channelId: number)
+    print(player, channelId)
+end)
+```
+
+---
 ### authorizedClient
 Calls the function whenever the server sends authorized channels to a client.
 ```lua

@@ -50,6 +50,31 @@ return function(props)
 				end,
 			}),
 
+			New("TextButton")({
+				Name = "Panic",
+				Size = UDim2.fromScale(0.2, 0.55),
+				BackgroundColor3 = Color3.fromRGB(200, 0, 0),
+				AnchorPoint = Vector2.new(1, 0.5),
+				Position = UDim2.fromScale(0.83, 0.5),
+				AutoButtonColor = true,
+
+				Text = "Panic",
+				FontFace = Font.new(
+					"rbxasset://fonts/families/Arial.json",
+					Enum.FontWeight.Regular,
+					Enum.FontStyle.Normal
+				),
+				TextScaled = true,
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextXAlignment = Enum.TextXAlignment.Center,
+
+				[Children] = {
+					UICorner = New("UICorner")({
+						CornerRadius = UDim.new(0.25, 0),
+					}),
+				},
+			}),
+
 			New("ImageButton")({
 				Name = "Chat",
 				Size = UDim2.fromScale(0.05, 0.6),

@@ -30,6 +30,7 @@ function main.init()
 		textEvents = {
 			clientMessage = textEvents:remoteEvent("clientMessage"),
 			systemMessage = textEvents:remoteEvent("systemMessage"),
+			panicButton = textEvents:remoteEvent("panicButton"),
 			sendHistory = textEvents:remoteEvent("sendHistory"),
 		},
 		voiceEvents = {
@@ -37,6 +38,7 @@ function main.init()
 		},
 		apiEvents = apiEvents,
 		serverApi = apiEvents:bindableEvent("serverApi"),
+		panicCooldowns = {},
 	}
 	local self = setmetatable(data, main)
 
@@ -48,6 +50,9 @@ function main.init()
 		self.serverApi:fire("receivedClientMessage", ...)
 	end)
 	self.textEvents.authorize = textEvents:remoteFunction("authorize", self, "authorizeClient")
+	self.textEvents.panicButton:connect(function(...)
+		self:receivePanic(...)
+	end)
 
 	self.voiceEvents.activateVoice:connect(function(...)
 		self:activateVoice(...)
@@ -90,6 +95,30 @@ function main:activateVoice(player: Player, channelId: number)
 		return
 	end
 	channel:activateVoice(player)
+end
+
+function main:receivePanic(player: Player, channelId: number)
+	if systemSettings.panicButtonEnabled ~= true then
+		warn("Panic button is not enabled")
+		return
+	end
+
+	if
+		self.panicCooldowns[player.UserId] ~= nil
+		and (os.time() - self.panicCooldowns[player.UserId]) < systemSettings.panicCooldown
+	then
+		warn("Panic button on cooldown for player")
+		return
+	end
+	self.panicCooldowns[player.UserId] = os.time()
+
+	local channel = self.channels[channelId]
+	if channel == nil then
+		warn("Received panic for non-existant channel")
+		return
+	end
+	channel:receivePanic(player)
+	self.serverApi:fire("receivedPanic", player, channelId)
 end
 
 function main:setupChannels()

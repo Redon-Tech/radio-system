@@ -9,12 +9,14 @@
 	Loader
 --]]
 
-local Players = game:GetService("Players")
 local settings = script.Parent.settings
 local systemSettings = require(settings)
 
 print(`\n		[RTRS]: Initializing System\n		Version: {systemSettings.v}\n		Debug Mode: {systemSettings.debug}`)
 
+if game.ReplicatedStorage:FindFirstChild("radioShared") then
+	game.ReplicatedStorage:FindFirstChild("radioShared"):Destroy()
+end
 local sharedFolder = script.shared
 sharedFolder.Name = "radioShared"
 sharedFolder.Parent = game.ReplicatedStorage
@@ -31,17 +33,6 @@ audioDistortion.Wire.TargetInstance = audioDistortion
 
 settings.Parent = sharedFolder
 
-local function initClient(Player: Player)
-	local PlayerGui = Player:WaitForChild("PlayerGui")
-	if PlayerGui:FindFirstChild("radioClient") then
-		return
-	end
-
-	local radioClient = script.client:Clone()
-	radioClient.Name = "radioClient"
-	radioClient.Parent = PlayerGui
-end
-
 local comm = require(sharedFolder:WaitForChild("comm"))
 comm.setup()
 
@@ -52,9 +43,5 @@ main.init()
 local radioClient = script.client:Clone()
 radioClient.Name = "radioClient"
 radioClient.Parent = game.StarterPlayer.StarterPlayerScripts
-
--- for _,player:Player in ipairs(Players:GetPlayers()) do
--- 	initClient(player)
--- end
 
 print("\n		[RTRS]: Initialized")

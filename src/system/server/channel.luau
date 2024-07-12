@@ -100,6 +100,26 @@ function channel:receiveMessage(player: Player, message: string)
 	end, self.id, player, message)
 end
 
+function channel:receivePanic(player: Player)
+	if self.players[player] == nil then
+		warn(`{player.Name} is not apart of {self.name}`)
+		return
+	end
+
+	local message = systemSettings.getPanicMessage(player)
+
+	if systemSettings.panicBehavior:lower() ~= "all" then
+		self.main.textEvents.panicButton:fireFilter(function(player: Player)
+			if self.players[player] then
+				return true
+			end
+			return false
+		end, self.id, player, message)
+	else
+		self.main.textEvents.panicButton:fireAll(true, player, message)
+	end
+end
+
 function channel:sendSystemMessage(message: SystemMessage)
 	self.main.textEvents.systemMessage:fireAll(self.id, message)
 end

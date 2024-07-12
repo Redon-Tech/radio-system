@@ -19,6 +19,12 @@
 			},
 			"Radio System Client API": {
 				"$path": "apis/client.luau"
+			},
+			"radioShared": {
+				"$path": "src/system/shared",
+				"settings": {
+					"$path": "src/settings.luau"
+				}
 			}
 		},
 		"StarterPlayer": {
@@ -60,6 +66,11 @@
 						"BrickColor": 23
 					}
 				}
+			}
+		},
+		"TextChatService": {
+			"$properties": {
+				"ChatVersion": "TextChatService"
 			}
 		},
 		"Workspace": {

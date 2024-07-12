@@ -77,6 +77,37 @@ settings.users = {
 	["over_twenty_characters"] = true,
 }
 
+--\ PANIC /--
+
+--[[
+	Is the panic button enabled?
+]]
+settings.panicButtonEnabled = true
+
+--[[
+	Panic button behavior
+
+	"all" - All channels will recieve panic
+	"channel" - Only the current channel will recieve panic
+]]
+settings.panicBehavior = "all"
+
+--[[
+	Determins the message sent when the panic button is pressed
+	Use this to give location or other information
+
+	Function MUST return a string
+]]
+settings.getPanicMessage = function(player: Player): string
+	return `{player.Name} has activated the panic button!`
+end
+
+--[[
+	Sets the panic button cooldown in seconds
+	This is per user
+]]
+settings.panicCooldown = 30
+
 --\ UI /--
 
 --[[
@@ -110,6 +141,8 @@ settings.keybinds = {
 	Default audio is from http://www.w2sjw.com/radio_sounds.html
 	sideTone is MDC_Sidetone
 	keyDown/keyUp/messageRecieved is MDC1200
+	panic button is a free audio taken from the marketplace
+	it should work without any changes.
 
 	You can set to nil or false to disable any sounds
 --]]
@@ -118,6 +151,7 @@ settings.audio = {
 	sideTone = "rbxassetid://16800390322",
 	keyDown = "rbxassetid://16800392019",
 	keyUp = "rbxassetid://16800392019",
+	panic = "rbxassetid://4887758282", -- This should work out of the box
 }
 
 --\ CHAT CONFIG /--
@@ -131,7 +165,7 @@ settings.audio = {
 settings.overrideWindowEnabled = true
 
 --\ DEVELOPER /--
-settings.v = "1.1.1"
+settings.v = "1.2.0"
 settings.debug = false
 
 return settings
