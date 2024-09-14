@@ -323,12 +323,14 @@ end
 function main:requestAuthorizedChannels()
 	local success, error = pcall(function()
 		local authorizedChannels = {}
+		local numberOfChannels = 0
 		for _, channelId in pairs(self.textEvents.comm:remoteFunction("authorize")) do
 			authorizedChannels[channelId] = systemSettings.channels[channelId]
+			numberOfChannels += 1
 		end
 		self.authorizedChannels:set(authorizedChannels)
 
-		if #authorizedChannels == 0 then
+		if numberOfChannels == 0 then
 			self.enabled:set(false)
 		else
 			self.enabled:set(true)
