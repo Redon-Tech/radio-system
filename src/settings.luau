@@ -173,7 +173,7 @@ settings.overrideWindowEnabled = true
 settings.additionalTopPadding = 50
 
 --\ DEVELOPER /--
-settings.v = "1.2.0"
+settings.v = "1.2.1"
 settings.debug = false
 
 return settings
