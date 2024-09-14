@@ -85,7 +85,13 @@ function channel:receiveMessage(player: Player, message: string)
 		warn(`{player.Name} is not apart of {self.name}`)
 		return
 	end
+	print(self.players[player], message)
+	if self.players[player] == message then
+		warn(`Recieved a duplicate message from {player.Name}, ignoring.`)
+		return
+	end
 	self:_addMessageToHistory(player, message)
+	self.players[player] = message
 
 	message = Chat:FilterStringAsync(message, player, player) -- Ideally we would filter with playerTo, but no
 	self.main.textEvents.clientMessage:fireFilter(function(player: Player)
