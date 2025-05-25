@@ -1,5 +1,6 @@
 {
 	"editor.detectIndentation": true,
 	"editor.insertSpaces": false,
-	"luau-lsp.sourcemap.rojoProjectFile": "develop.project.json"
+	"luau-lsp.sourcemap.rojoProjectFile": "develop.project.json",
+	"stylua.targetReleaseVersion": "latest"
 }

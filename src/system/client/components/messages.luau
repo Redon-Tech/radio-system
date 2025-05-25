@@ -27,6 +27,7 @@ return function(props)
 		end,
 
 		[Children] = {
+			--selene: allow(mixed_table)
 			UIListLayout = New("UIListLayout")({
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder,

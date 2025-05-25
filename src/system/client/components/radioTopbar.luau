@@ -18,6 +18,7 @@ return function(props)
 				CornerRadius = UDim.new(0, 10),
 			}),
 
+			--selene: allow(mixed_table)
 			Frame = New("Frame")({
 				Name = "Cover",
 				Size = UDim2.new(1, 0, 0, 10),
