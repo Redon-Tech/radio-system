@@ -3,16 +3,8 @@ authors:
     - parker02311
 ---
 
-!!! warning
-
-    The system is in full release, however there may still be bugs due to the still developing audio APIs. Please be patient and understanding with us. If you find a bug please report it via [GitHub](https://github.com/Redon-Tech/Radio-System/issues/new).
-
-# Video Guide
-You can watch a video guide on how to setup the system [here](https://youtu.be/7m3UsATBVXw).
-
-??? warning
-
-    This video could become outdated in the future. If you are having issues please refer to the text guide.
+!!! tip ""
+    Prefer videos? Check out our [YouTube tutorial](https://youtu.be/7m3UsATBVXw) for a step-by-step guide on how to set up the Radio System.
 
 # Overview
 The Radio System is designed to be easy to install and use, however if you have any issues with installation or usage please create a support thread in our [Discord](https://cdn.redon.tech/go/discord).

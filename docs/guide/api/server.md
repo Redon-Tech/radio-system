@@ -65,7 +65,7 @@ Calls the function whenever we receieve a message from a player.
 
 #### Example Usage
 ```lua
-local connection = serverAPI:clientMessageRecieved(function(player: Player, message: string, channelId: number)
+local connection = serverAPI:receivedClientMessage(function(player: Player, message: string, channelId: number)
     print(player, message, channelId)
 end)
 
@@ -75,7 +75,7 @@ connection:disconnect()
 ```
 
 ---
-### receivedClientMessage
+### receivedActivateVoice
 Calls the function whenever a player **tries** to use the voice channel.
 ```lua
 (
@@ -89,7 +89,7 @@ Calls the function whenever a player **tries** to use the voice channel.
 
 #### Example Usage
 ```lua
-serverAPI:clientMessageRecieved(function(player: Player, channelId: number)
+serverAPI:receivedActivateVoice(function(player: Player, channelId: number)
     print(player, channelId)
 end)
 ```

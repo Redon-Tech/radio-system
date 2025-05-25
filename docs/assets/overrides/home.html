@@ -1,6 +1,35 @@
 {% extends "main.html" %}
 
+{% block tabs %}
+{{ super() }}
+
+<div class="hero md-content">
+
+	<div class="hero-content md-content__inner md-typeset">
+
+		<h1><b>Ditch Alt-Tabbing</b></h1>
+		<p>
+			The Radio System is a powerful and flexible system for Roblox, allowing you to stop alt-tabbing
+			between Roblox and other platforms to switch radio channels.
+		</p>
+		<p>
+			Radio System supports both text and voice chat, allowing your players to communicate with each other
+			seamlessly. Additionally, you can finely control who can access the radio system, and what channels.
+		</p>
+		<p>
+			Ditch complex Discord channel setups, alt-tabbing and learn what a real radio system is.
+		</p>
+		<div class="hero-links">
+			<a href="https://create.roblox.com/marketplace/asset/16849649949">Download Now</a>
+			<a href="/setup" class="padd">Guide to get started</a>
+		</div>
+	</div>
+
+	<img class="hero-image" src="/assets/Radio.png" alt="Radio System Example" />
+</div>
+
+{% endblock %}
+
 {% block content %}
 <link rel="stylesheet" href="assets/css/home.css">
-{{ super() }}
 {% endblock %}

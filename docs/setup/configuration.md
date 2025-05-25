@@ -115,7 +115,7 @@ Default Value:
 settings.panicBehavior = "all"
 ```
 
-### `settings.getPanicMessage`
+#### `settings.getPanicMessage`
 A function that returns the message that will be sent when the panic button is pressed.
 
 Parameters:
@@ -132,7 +132,7 @@ settings.getPanicMessage = function(player: Player): string
 end
 ```
 
-### `settings.panicCooldown`
+#### `settings.panicCooldown`
 Controls the cooldown of the panic button in seconds.
 Default Value:
 ```lua
@@ -224,7 +224,7 @@ Default Value:
 settings.overrideWindowEnabled = true
 ```
 
-### `settings.additionalTopPadding`
+#### `settings.additionalTopPadding`
 Adds additional padding to the top of the chat window when the radio UI is in the TopLeft position.
 
 If the radio is not in the TopLeft position, it is recommended to set this value to 0.

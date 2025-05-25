@@ -112,6 +112,7 @@ Calls the function whenever we recieve a panic button activation.
 (
     func: (channelId: number | boolean, player: Player, message: string) -> nil
 ) -> ScriptConnection
+```
 
 #### Parameters
 
@@ -119,7 +120,7 @@ Calls the function whenever we recieve a panic button activation.
 
 #### Example Usage
 ```lua
-clientAPI:clientMessageRecieved(function(channelId: number | boolean, player: Player, message: string)
+clientAPI:panicButtonActivated(function(channelId: number | boolean, player: Player, message: string)
     if channelId == true then
         print("Panic Button Activated on all channels")
     else
