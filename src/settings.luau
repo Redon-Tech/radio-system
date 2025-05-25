@@ -47,6 +47,22 @@ settings.channels = {
 --]]
 settings.channelHistory = 100
 
+--\ VOICE /--
+
+--[[
+	How should the voice chat be heard?
+	"player" - Audio is from the player's character
+	"camera" - Audio is from the player's camera
+]]
+settings.voiceType = "player"
+
+--[[
+	Audio boost
+	Increase this if the audio is too quiet, max is 3
+	This max is a limit of Roblox, do not report issues if you cant get over 3.
+]]
+settings.audioBoost = 1
+
 --\ ACCESS /--
 
 --[[
@@ -179,7 +195,7 @@ settings.additionalTopPadding = 50
 settings.defaultTextChannel = "RBXGeneral"
 
 --\ DEVELOPER /--
-settings.v = "1.2.1"
+settings.v = "1.3"
 settings.debug = false
 
 return settings

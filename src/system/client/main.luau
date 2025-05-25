@@ -11,8 +11,8 @@ local TextChatService = game:GetService("TextChatService")
 local localPlayer = Players.LocalPlayer
 local shared = ReplicatedStorage:WaitForChild("radioShared")
 local effects = shared:WaitForChild("effects")
-local audioDistortion = effects:WaitForChild("AudioDistortion")
-local audioEqualizer = effects:WaitForChild("AudioEqualizer")
+local audioEqualizer = effects:WaitForChild("1 - Equalizer")
+local audioFader = effects:WaitForChild("3 - Fader")
 local Fusion = require(shared:WaitForChild("Fusion"))
 local systemSettings = require(shared:WaitForChild("settings"))
 local comm = require(shared:WaitForChild("comm"))
@@ -164,7 +164,10 @@ function main:setupEvents()
 		if self.enabled:get() == true then
 			print("Radio Enabled")
 			local emitterWire = character:WaitForChild("RSEmitter"):WaitForChild("Wire")
-			emitterWire.SourceInstance = audioDistortion
+			emitterWire.SourceInstance = audioFader
+			if systemSettings.voiceType:lower() == "camera" then
+				emitterWire.Parent.Parent = workspace.CurrentCamera
+			end
 			local wire = shared:WaitForChild("wires"):WaitForChild(self.activeChannel:get())
 			wire.TargetInstance = audioEqualizer
 			self.activeWire:set(wire)

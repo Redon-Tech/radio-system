@@ -55,6 +55,33 @@ settings.channelHistory = 100
 ```
 
 ---
+### Voice
+Configuration for the voice chat API.
+
+#### `settings.voiceType`
+Sets where the sound of radio voice chat will be played.
+The possible values are: 
+
+| Value  | Description                                             |
+| ------ | ------------------------------------------------------- |
+| player | The sound will be played from the character's position. |
+| camera | The sound will be played from the camera's position.    |
+
+Default Value:
+```lua
+settings.voiceType = "character"
+```
+
+#### `settings.audioBoost`
+Sets the audio boost for the radio voice chat.
+This can only be set to a value between 0 and 3. Because of Roblox, do not complain or open a support thread about this limit, complain to Roblox.
+
+Default Value:
+```lua
+settings.audioBoost = 1
+```
+
+---
 ### Access
 Controls what teams/users have access to what channels. 
 This entire section follows the same format. 

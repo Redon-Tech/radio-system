@@ -26,10 +26,13 @@ wireFolder.Name = "wires"
 wireFolder.Parent = sharedFolder
 
 local effectFolder = sharedFolder:WaitForChild("effects")
-local audioDistortion = effectFolder:WaitForChild("AudioDistortion")
-local audioEqualizer = effectFolder:WaitForChild("AudioEqualizer")
+local audioEqualizer = effectFolder:WaitForChild("1 - Equalizer")
+local audioDistortion = effectFolder:WaitForChild("2 - Distortion")
+local audioFader = effectFolder:WaitForChild("3 - Fader")
 audioDistortion.Wire.SourceInstance = audioEqualizer
 audioDistortion.Wire.TargetInstance = audioDistortion
+audioFader.Wire.SourceInstance = audioDistortion
+audioFader.Wire.TargetInstance = audioFader
 
 settings.Parent = sharedFolder
 

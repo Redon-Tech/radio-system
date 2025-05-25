@@ -4,12 +4,27 @@
 		{
 			"ClassName": "AudioEqualizer",
 			"Properties": {
+				"Name": "1 - Equalizer",
 				"HighGain": 10,
 				"LowGain": -40
 			}
 		},
 		{
 			"ClassName": "AudioDistortion",
+			"Properties": {
+				"Name": "2 - Distortion"
+			},
+			"Children": [
+				{
+					"ClassName": "Wire"
+				}
+			]
+		},
+		{
+			"ClassName": "AudioFader",
+			"Properties": {
+				"Name": "3 - Fader"
+			},
 			"Children": [
 				{
 					"ClassName": "Wire"
