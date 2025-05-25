@@ -234,6 +234,15 @@ Default Value:
 settings.additionalTopPadding = 50
 ```
 
+#### `settings.defaultTextChannel`
+Controls the default text channel that the radio system will use when the player loses their radio permissions.
+This should only need to be changed if TextChatService.CreateDefaultTextChannels is set to false.
+
+Default Value:
+```lua
+settings.defaultTextChannel = "RBXGeneral"
+```
+
 ---
 ### DEVELOPER
 Best not to touch anything

@@ -21,11 +21,11 @@ local audio = require(script.Parent:WaitForChild("audio"))
 
 local New, Children, Value, ForPairs, Observer, OnEvent =
 	Fusion.New, Fusion.Children, Fusion.Value, Fusion.ForPairs, Fusion.Observer, Fusion.OnEvent
-local radioTopbar = require(components:WaitForChild("radioTopbar"))
-local radioChannels = require(components:WaitForChild("radioChannels"))
-local radioChannel = require(components:WaitForChild("radioChannel"))
-local messages = require(components:WaitForChild("messages"))
-local message = require(components:WaitForChild("message"))
+local radioTopbarComponent = require(components:WaitForChild("radioTopbar"))
+local radioChannelsComponent = require(components:WaitForChild("radioChannels"))
+local radioChannelComponent = require(components:WaitForChild("radioChannel"))
+local messagesComponent = require(components:WaitForChild("messages"))
+local messageComponent = require(components:WaitForChild("message"))
 
 local print = function(...)
 	if systemSettings.debug then
@@ -52,7 +52,6 @@ function main.init()
 	local data = {
 		textEvents = {
 			comm = textEvents,
-			clientMessage = textEvents:remoteEvent("clientMessage"),
 			systemMessage = textEvents:remoteEvent("systemMessage"),
 			panicButton = textEvents:remoteEvent("panicButton"),
 			sendHistory = textEvents:remoteEvent("sendHistory"),
@@ -72,6 +71,7 @@ function main.init()
 		activeWire = Value(nil),
 		textActive = Value(false),
 		voiceActive = Value(false),
+		channelConnections = {},
 	}
 	local self = setmetatable(data, main)
 
@@ -99,11 +99,6 @@ function main.init()
 end
 
 function main:setupEvents()
-	self.textEvents.clientMessage:connect(function(...)
-		self:receiveClientMessage(...)
-		self.clientApi:fire("clientMessageRecieved", ...)
-	end)
-
 	self.textEvents.systemMessage:connect(function(...)
 		self:receiveMessage(...)
 		self.clientApi:fire("systemMessageRecieved", ...)
@@ -159,22 +154,6 @@ function main:setupEvents()
 		end
 	end)
 
-	if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
-		localPlayer.Chatted:Connect(function(message)
-			if self.textActive:get() then
-				self.textEvents.clientMessage:fire(message, self.activeChannel:get())
-				self.clientApi:fire("sendMessage", self.activeChannel:get(), message)
-			end
-		end)
-	elseif TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
-		TextChatService.SendingMessage:Connect(function(textChatMessage)
-			if self.textActive:get() then
-				self.textEvents.clientMessage:fire(textChatMessage.Text, self.activeChannel:get())
-				self.clientApi:fire("sendMessage", self.activeChannel:get(), textChatMessage.Text)
-			end
-		end)
-	end
-
 	localPlayer:GetPropertyChangedSignal("Team"):Connect(function()
 		self:requestAuthorizedChannels()
 	end)
@@ -225,6 +204,14 @@ function main:setupObservers()
 			or "rbxassetid://16516253569"
 		self.mainUi.Container.Radio.Topbar.Chat.ImageColor3 = textActive and Color3.fromRGB(255, 255, 255)
 			or Color3.fromRGB(255, 0, 0)
+
+		if textActive == true and self.enabled:get() == true then
+			local channel = self.authorizedChannels:get()[self.activeChannel:get()]
+			TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration").TargetTextChannel = channel
+		else
+			TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration").TargetTextChannel =
+				TextChatService:FindFirstChild(systemSettings.defaultTextChannel, true)
+		end
 	end)
 
 	voiceActiveObserver:onChange(function()
@@ -282,6 +269,8 @@ function main:setupObservers()
 				end
 			end
 		elseif enabled == false then
+			TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration").TargetTextChannel =
+				TextChatService:FindFirstChild(systemSettings.defaultTextChannel, true)
 			if systemSettings.overrideWindowEnabled == true then
 				if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
 					local windowConfig = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
@@ -301,7 +290,7 @@ function main:setupChannels()
 	print("Setting up channels")
 
 	local channels = {}
-	for id, channel in pairs(systemSettings.channels) do
+	for id, _ in pairs(systemSettings.channels) do
 		local messages = Value({})
 		channels[id] = messages
 
@@ -321,12 +310,33 @@ end
 -- Combo Features
 
 function main:requestAuthorizedChannels()
+	-- clear current messages and authorized channels
+	self.activeMessages:set({})
+	self.authorizedChannels:set({})
+	self.channels = self:setupChannels()
+	for _, connection in self.channelConnections do
+		connection:Disconnect()
+	end
+
 	local success, error = pcall(function()
 		local authorizedChannels = {}
 		local numberOfChannels = 0
-		for _, channelId in pairs(self.textEvents.comm:remoteFunction("authorize")) do
-			authorizedChannels[channelId] = systemSettings.channels[channelId]
+		for channelId, textChannel: TextChannel in pairs(self.textEvents.comm:remoteFunction("authorize")) do
+			authorizedChannels[channelId] = textChannel
 			numberOfChannels += 1
+
+			table.insert(
+				self.channelConnections,
+				textChannel.MessageReceived:Connect(function(message: TextChatMessage)
+					local player = Players:GetPlayerByUserId(message.TextSource.UserId)
+					self:receiveClientMessage({
+						channelId = channelId,
+						player = player,
+						message = message.Text,
+					})
+					self.clientApi:fire("clientMessageRecieved", channelId, player, message.Text)
+				end)
+			)
 		end
 		self.authorizedChannels:set(authorizedChannels)
 
@@ -339,6 +349,8 @@ function main:requestAuthorizedChannels()
 					self.activeChannel:set(channelId)
 					break
 				end
+			else
+				self:activeChannelChange()
 			end
 		end
 	end)
@@ -351,7 +363,12 @@ end
 
 function main:activeChannelChange()
 	local activeChannel = self.activeChannel:get()
-	self.activeMessages:set(table.clone(self.channels[activeChannel]:get()))
+	local channelMessages = self.channels[activeChannel]:get()
+	self.activeMessages:set(table.clone(channelMessages))
+	if self.textActive:get() == true then
+		local channel = self.authorizedChannels:get()[activeChannel]
+		TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration").TargetTextChannel = channel
+	end
 	if self.activeWire:get() then
 		self.activeWire:get().TargetInstance = nil
 	end
@@ -379,28 +396,36 @@ function main:recieveChannelHistory(channelId: number, history: {})
 		warn("Received history for non-existant channel")
 		return
 	end
-	local newHistory = {}
+
+	print("recievingHistory", history)
 	for _, message in pairs(history) do
-		table.insert(newHistory, {
-			id = #newHistory + 1,
-			icon = game.Players:GetUserThumbnailAsync(
-				message.player.UserId,
-				Enum.ThumbnailType.HeadShot,
-				Enum.ThumbnailSize.Size48x48
-			),
-			iconRounded = true,
-			headerText = message.player.Name,
-			text = message.message,
-			sideAccent = message.color,
-		})
+		if message.type == "player" then
+			self:receiveClientMessage({
+				channelId = channelId,
+				player = message.data.player,
+				message = message.data.message,
+			})
+		elseif message.type == "system" then
+			self:receiveMessage({ channelId = channelId, message = message.data.message })
+		elseif message.type == "panic" then
+			self:recievePanicButton({
+				channelId = channelId,
+				player = message.data.player,
+				message = message.data.message,
+				noAudio = true,
+			})
+		end
 	end
-	channel:set(newHistory)
 	if channelId == self.activeChannel:get() then
 		self:activeChannelChange()
 	end
 end
 
-function main:receiveClientMessage(channelId: number, player: Player, message: string)
+function main:receiveClientMessage(data: { channelId: number, player: Player, message: string })
+	local channelId = data.channelId
+	local player = data.player
+	local message = data.message
+
 	local channel = self.channels[channelId]
 	if channel == nil then
 		warn("Received message for non-existant channel")
@@ -431,7 +456,7 @@ function main:receiveClientMessage(channelId: number, player: Player, message: s
 	end
 end
 
-function main:receiveMessage(
+function main:receiveMessage(data: {
 	channelId: number,
 	message: {
 		text: string,
@@ -443,8 +468,12 @@ function main:receiveMessage(
 		sideText: string?,
 		sideAccent: Color3?,
 	},
-	playPanicSound: boolean?
-)
+	playPanicSound: boolean?,
+})
+	local channelId = data.channelId
+	local message = data.message
+	local playPanicSound = data.playPanicSound
+
 	local channel = self.channels[channelId]
 	if channel == nil then
 		warn("Received message for non-existant channel")
@@ -473,7 +502,15 @@ function main:receiveMessage(
 	end
 end
 
-function main:recievePanicButton(channelId: number | boolean, player: Player, message: string)
+function main:recievePanicButton(
+	data: { channelId: number | boolean, player: Player, message: string, noAudio: boolean? }
+)
+	local channelId = data.channelId
+	local player = data.player
+	local message = data.message
+	local noAudio = data.noAudio
+
+	print("panic", channelId, player, message, noAudio)
 	local panicMessage = {
 		text = message,
 		headerText = player.Name,
@@ -489,10 +526,18 @@ function main:recievePanicButton(channelId: number | boolean, player: Player, me
 
 	if channelId == true then
 		for id, _ in pairs(self.authorizedChannels:get()) do
-			self:receiveMessage(id, panicMessage, true)
+			self:receiveMessage({
+				channelId = id,
+				message = panicMessage,
+				playPanicSound = if noAudio == true then false else true,
+			})
 		end
 	else
-		self:receiveMessage(channelId, panicMessage, true)
+		self:receiveMessage({
+			channelId = channelId,
+			message = panicMessage,
+			playPanicSound = if noAudio == true then false else true,
+		})
 	end
 end
 
@@ -592,26 +637,26 @@ function main:createUi()
 								MaxSize = systemSettings.uiMaxSize,
 							}),
 
-							Topbar = radioTopbar({
+							Topbar = radioTopbarComponent({
 								visible = self.visible,
 							}),
-							Channels = radioChannels({
+							Channels = radioChannelsComponent({
 								[Children] = {
-									ForPairs(self.authorizedChannels, function(id, channel)
+									ForPairs(self.authorizedChannels, function(id: number, channel: TextChannel)
 										return id,
-											radioChannel({
+											radioChannelComponent({
 												Id = id,
-												Text = channel.name,
+												Text = channel.Name,
 												activeChannel = self.activeChannel,
 											})
 									end, Fusion.cleanup),
 								},
 							}),
-							Messages = messages({
+							Messages = messagesComponent({
 								[Children] = {
 									ForPairs(self.activeMessages, function(id, messageData)
 										return id,
-											message({
+											messageComponent({
 												id = id,
 												backgroundColor3 = messageData.backgroundColor3,
 												icon = messageData.icon,

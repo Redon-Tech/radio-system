@@ -172,6 +172,12 @@ settings.overrideWindowEnabled = true
 ]]
 settings.additionalTopPadding = 50
 
+--[[
+	Default text chat channel
+	Only change this if you have TextChatService.CreateDefaultChannels set to false
+]]
+settings.defaultTextChannel = "RBXGeneral"
+
 --\ DEVELOPER /--
 settings.v = "1.2.1"
 settings.debug = false

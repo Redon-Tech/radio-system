@@ -170,26 +170,6 @@ end)
 ```
 
 ---
-### sendMessage
-Calls the function whenever we send a message to the selected channel.
-```lua
-(
-    func: (channelId: number, message: string) -> nil
-) -> ScriptConnection
-```
-
-#### Parameters
-
-- `func: (channelId: number, message: string) -> nil` - a function that accepts a number and string as its parameters and returns nil.
-
-#### Example Usage
-```lua
-clientAPI:clientMessageRecieved(function(channelId: number, message: string)
-    print(channelId, message)
-end)
-```
-
----
 ### textActivateChanged
 Calls the function whenever we the player activated or deactivated the text chat.
 ```lua

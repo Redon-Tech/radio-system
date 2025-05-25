@@ -103,10 +103,6 @@ function client:voiceRecieve(func: (channelId: number, player: Player) -> nil): 
 	return self:_connect("voiceRecieve", func)
 end
 
-function client:sendMessage(func: (channelId: number, message: string) -> nil): ScriptConnection
-	return self:_connect("sendMessage", func)
-end
-
 function client:textActivateChanged(func: (active: boolean) -> nil): ScriptConnection
 	return self:_connect("textActivateChanged", func)
 end

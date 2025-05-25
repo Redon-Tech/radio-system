@@ -15,7 +15,10 @@ local channel = {}
 channel.__index = channel
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Chat = game:GetService("Chat")
+local VoiceChatService = game:GetService("VoiceChatService")
+local TextChatService = game:GetService("TextChatService")
+local TextService = game:GetService("TextService")
+local Players = game:GetService("Players")
 
 local shared = ReplicatedStorage:WaitForChild("radioShared")
 local systemSettings = require(shared:WaitForChild("settings"))
@@ -58,21 +61,27 @@ function channel.init(main: { any }, id: number)
 	self.wire.Name = self.id
 	self.wire.Parent = shared:WaitForChild("wires")
 
+	self.textChannel = Instance.new("TextChannel")
+	self.textChannel.Name = self.name
+	self.textChannel.Parent = TextChatService
+	self.textChannel.ShouldDeliverCallback = function(...)
+		return self:shouldDeliverCallback(...)
+	end
+
 	print(`Initialized Channel {id}`)
 	return self
 end
 
 -- Text Features
 
-function channel:_addMessageToHistory(player: Player?, message: string)
+function channel:_addMessageToHistory(type: string, data: { [any]: any })
 	if systemSettings.channelHistory == 0 then
 		return
 	end
 
 	table.insert(self.messages, {
-		player = if player ~= nil then player else "System",
-		message = message,
-		color = if player ~= nil then player.TeamColor.Color else Color3.new(),
+		type = type,
+		data = data,
 	})
 
 	if #self.messages >= systemSettings.channelHistory then
@@ -80,26 +89,35 @@ function channel:_addMessageToHistory(player: Player?, message: string)
 	end
 end
 
-function channel:receiveMessage(player: Player, message: string)
-	if self.players[player] == nil then
-		warn(`{player.Name} is not apart of {self.name}`)
-		return
-	end
-	print(self.players[player], message)
-	if self.players[player] == message then
-		warn(`Recieved a duplicate message from {player.Name}, ignoring.`)
-		return
-	end
-	self:_addMessageToHistory(player, message)
-	self.players[player] = message
-
-	message = Chat:FilterStringAsync(message, player, player) -- Ideally we would filter with playerTo, but no
-	self.main.textEvents.clientMessage:fireFilter(function(player: Player)
-		if self.players[player] then
-			return true
-		end
+function channel:shouldDeliverCallback(message: TextChatMessage, textSource: TextSource): boolean
+	local player = Players:GetPlayerByUserId(textSource.UserId)
+	if player == nil then
+		warn(`{textSource.Name} is not a player`)
 		return false
-	end, self.id, player, message)
+	end
+
+	if self.players[player] == nil then
+		warn(`{textSource.Name} is not apart of {self.name}`)
+		return false
+	end
+	print(self.players[player], message.Text)
+	if self.players[player] == message.Text then
+		warn(`Recieved a duplicate message from {textSource.Name}, ignoring.`)
+		return false
+	end
+
+	self:_addMessageToHistory("player", {
+		player = {
+			Name = player.Name,
+			TeamColor = player.TeamColor,
+			UserId = player.UserId,
+		},
+		message = message.Text,
+	})
+	self.players[player] = message.Text
+
+	self.main.serverApi:fire("receivedClientMssage", player, message.Text, self.id)
+	return true
 end
 
 function channel:receivePanic(player: Player)
@@ -109,21 +127,34 @@ function channel:receivePanic(player: Player)
 	end
 
 	local message = systemSettings.getPanicMessage(player)
+	if typeof(message) ~= "string" then
+		warn("getPanicMessage MUST return a string")
+		return
+	end
 
+	self:_addMessageToHistory("panic", {
+		player = {
+			Name = player.Name,
+			TeamColor = player.TeamColor,
+			UserId = player.UserId,
+		},
+		message = message,
+	})
 	if systemSettings.panicBehavior:lower() ~= "all" then
-		self.main.textEvents.panicButton:fireFilter(function(player: Player)
-			if self.players[player] then
+		self.main.textEvents.panicButton:fireFilter(function(playerToFilter: Player)
+			if self.players[playerToFilter] then
 				return true
 			end
 			return false
-		end, self.id, player, message)
+		end, { channelId = self.id, player = player, message = message })
 	else
-		self.main.textEvents.panicButton:fireAll(true, player, message)
+		self.main.textEvents.panicButton:fireAll({ channelId = true, player = player, message = message })
 	end
 end
 
 function channel:sendSystemMessage(message: SystemMessage)
-	self.main.textEvents.systemMessage:fireAll(self.id, message)
+	self:_addMessageToHistory("system", { message = message })
+	self.main.textEvents.systemMessage:fireAll({ channelId = self.id, message = message })
 end
 
 -- Voice Features
@@ -135,6 +166,10 @@ function channel:activateVoice(player: Player)
 	end
 	if self.players[player] == nil then
 		warn(`{player.Name} is not apart of {self.name}`)
+		return
+	end
+	if VoiceChatService:IsVoiceEnabledForUserIdAsync(player.UserId) == false then
+		warn(`{player.Name} does not have voice chat, ignoring.`)
 		return
 	end
 
@@ -151,28 +186,33 @@ end
 function channel:addPlayer(player: Player)
 	local playerHistory = {}
 	for _, message in pairs(self.messages) do
-		local success, filteredMessage = pcall(function()
-			return Chat:FilterStringAsync(message.message, message.player, message.player)
-		end)
-		if success == false then
-			warn("Could not filter\n", filteredMessage)
-			filteredMessage = Chat:FilterStringForBroadcast(message.message, player)
+		if message.type == "player" then
+			local messageData = message.data
+			local filteredMessage = TextService:FilterStringAsync(messageData.message, player.UserId)
+				:GetNonChatStringForBroadcastAsync()
+
+			table.insert(playerHistory, {
+				type = "player",
+				data = {
+					player = messageData.player,
+					message = filteredMessage,
+				},
+			})
+		else
+			table.insert(playerHistory, message)
 		end
-		table.insert(playerHistory, {
-			player = message.player,
-			message = filteredMessage,
-			color = message.color,
-		})
 	end
 	self.main.textEvents.sendHistory:fire(player, self.id, playerHistory)
 
 	if self.players[player] then
 		print(`[adding,debug] {player.Name} is already apart of {self.name}`)
-		return
+		return self.textChannel
 	end
 
 	self.players[player] = true
+	self.textChannel:AddUserAsync(player.UserId)
 	self.main.serverApi:fire("channelAddPlayer", self.id, player)
+	return self.textChannel
 end
 
 function channel:removePlayer(player: Player)
@@ -204,8 +244,7 @@ function channel:addPlayerWithChecks(player: Player): boolean
 		or (player.Team ~= nil and self.teams[player.Team.Name] == true)
 		or self.isDefaultChannel
 	then
-		self:addPlayer(player)
-		return true
+		return self:addPlayer(player)
 	end
 	self:removePlayer(player)
 	return false

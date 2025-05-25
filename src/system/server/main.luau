@@ -28,7 +28,6 @@ function main.init()
 	local apiEvents = comm.new("api")
 	local data = {
 		textEvents = {
-			clientMessage = textEvents:remoteEvent("clientMessage"),
 			systemMessage = textEvents:remoteEvent("systemMessage"),
 			panicButton = textEvents:remoteEvent("panicButton"),
 			sendHistory = textEvents:remoteEvent("sendHistory"),
@@ -45,10 +44,6 @@ function main.init()
 	self.channels = self:setupChannels()
 	self:setupAudio()
 
-	self.textEvents.clientMessage:connect(function(...)
-		self:receiveMessage(...)
-		self.serverApi:fire("receivedClientMessage", ...)
-	end)
 	self.textEvents.authorize = textEvents:remoteFunction("authorize", self, "authorizeClient")
 	self.textEvents.panicButton:connect(function(...)
 		self:receivePanic(...)
@@ -70,22 +65,14 @@ end
 function main:authorizeClient(player: Player)
 	local authorizedChannels = {}
 	for id, channel in pairs(self.channels) do
-		if channel:addPlayerWithChecks(player) then
-			table.insert(authorizedChannels, id)
+		local textChannel = channel:addPlayerWithChecks(player)
+		if textChannel ~= false then
+			authorizedChannels[id] = textChannel
 		end
 	end
 	self.serverApi:fire("authorizedClient", player, authorizedChannels)
 
 	return authorizedChannels
-end
-
-function main:receiveMessage(player: Player, message: string, channelId: number)
-	local channel = self.channels[channelId]
-	if channel == nil then
-		warn("Received message for non-existant channel")
-		return
-	end
-	channel:receiveMessage(player, message)
 end
 
 function main:activateVoice(player: Player, channelId: number)
@@ -125,7 +112,7 @@ function main:setupChannels()
 	print("Setting up channels")
 
 	local channels = {}
-	for id, channel in pairs(systemSettings.channels) do
+	for id, _ in pairs(systemSettings.channels) do
 		channels[id] = require(script.Parent:WaitForChild("channel")).init(self, id)
 	end
 
@@ -134,14 +121,7 @@ function main:setupChannels()
 end
 
 function main:characterAdded(input: AudioDeviceInput, character: Model)
-	-- local emitter = Instance.new("AudioEmitter")
-	-- emitter.Parent = character
-
-	-- local wire = Instance.new("Wire")
-	-- wire.SourceInstance = input
-	-- wire.TargetInstance = emitter
-	-- wire.Parent = emitter
-
+	character.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
 	local rootPart = character:WaitForChild("HumanoidRootPart")
 
 	local emitter = Instance.new("AudioEmitter")
@@ -168,19 +148,8 @@ end
 
 function main:setupAudio()
 	print("Setting up voice system")
-	-- if VoiceChatService.EnableDefaultVoice == true then
-	-- 	warn("VoiceChatService must have EnableDefaultVoice set to false for the voice system to work")
-	-- 	return
-	-- end
-	-- if VoiceChatService.UseAudioApi ~= Enum.AudioApiRollout.Enabled then
-	-- 	warn("VoiceChatService must have UseAudioApi set to Enabled for the voice system to work")
-	-- 	return
-	-- end
 
 	local function playerAdded(player: Player)
-		-- local input = Instance.new("AudioDeviceInput")
-		-- input.Player = player
-		-- input.Parent = player
 		local input = player:WaitForChild("AudioDeviceInput")
 
 		player.CharacterAdded:Connect(function(character)

@@ -151,6 +151,15 @@ function comm:remoteEvent(
 			end
 		end
 
+		function remoteEvent:fireDataFromFunction(func: (Player, ...any) -> ...any, ...)
+			for _, player: Player in Players:GetPlayers() do
+				local data = func(player, ...)
+				if data ~= nil then
+					self:fire(player, data)
+				end
+			end
+		end
+
 		return remoteEvent
 	else
 		local remoteEvent = {}
